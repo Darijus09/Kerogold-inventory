@@ -302,10 +302,10 @@
       <input type="number" id="modal-qty-set" placeholder="Set exact quantity">
       <button class="secondary" onclick="applySetQty()">Set</button>
     </div>
-    <div class="qty-set-row">
-      <input type="number" id="modal-qty-change" placeholder="Pieces to add or remove" min="1">
-      <button class="secondary" style="width:auto;padding:10px 12px;color:var(--green);border-color:var(--green);" onclick="applyModalChange(1)">+ Add</button>
-      <button class="secondary" style="width:auto;padding:10px 12px;color:var(--red);border-color:var(--red);" onclick="applyModalChange(-1)">− Remove</button>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <input type="number" id="modal-qty-change" placeholder="How many pieces" min="1" style="margin:0;flex:1;">
+      <button onclick="applyModalChange(1)" style="padding:10px 14px;background:var(--green);color:#fff;border:none;cursor:pointer;white-space:nowrap;font-size:13px;">+ Add</button>
+      <button onclick="applyModalChange(-1)" style="padding:10px 14px;background:var(--red);color:#fff;border:none;cursor:pointer;white-space:nowrap;font-size:13px;">− Remove</button>
     </div>
 
     <div class="detail-row"><span>Category</span><span id="modal-category"></span></div>
