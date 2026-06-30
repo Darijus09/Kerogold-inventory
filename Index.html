@@ -208,14 +208,20 @@
   <main>
     <div id="inventory" class="screen active">
       <div class="filters">
-        <input id="f-search" placeholder="Search name / SKU" oninput="renderProducts()">
-        <select id="f-category" onchange="renderProducts()"><option value="">All categories</option></select>
-        <select id="f-location" onchange="renderProducts()"><option value="">All locations</option></select>
-        <select id="f-stock" onchange="renderProducts()">
+        <input id="f-search" placeholder="Search name / SKU" oninput="onFilterChange()">
+        <select id="f-category" onchange="onFilterChange()"><option value="">All categories</option></select>
+        <select id="f-location" onchange="onFilterChange()"><option value="">All locations</option></select>
+        <select id="f-stock" onchange="onFilterChange()">
           <option value="">All stock</option>
           <option value="instock">In stock</option>
           <option value="low">Low (≤2)</option>
           <option value="out">Out of stock</option>
+        </select>
+        <select id="f-pagesize" onchange="onFilterChange()" style="min-width:90px;">
+          <option value="25">Show 25</option>
+          <option value="50" selected>Show 50</option>
+          <option value="100">Show 100</option>
+          <option value="200">Show 200</option>
         </select>
       </div>
       <div class="summary-bar">
@@ -226,6 +232,7 @@
         <span id="summary-count">—</span>
       </div>
       <div id="product-list"><div class="spinner-wrap">Loading inventory…</div></div>
+      <div id="pagination" style="display:flex;justify-content:center;align-items:center;gap:12px;padding:14px 0;"></div>
     </div>
 
     <div id="scan" class="screen">
@@ -337,6 +344,8 @@
   let html5QrCode = null;
   let scanCooldown = false;
   let pendingPhotoDataUrl = '';
+  let currentPage = 1;
+  let photoObserver = null;
 
   // ---------- BOOT ----------
   function boot() {
@@ -474,27 +483,38 @@
     });
   }
 
+  function onFilterChange() {
+    currentPage = 1;
+    renderProducts();
+  }
+
   function renderProducts() {
     const filtered = getFiltered();
+    const pageSize = Number(document.getElementById('f-pagesize').value) || 50;
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const pageItems = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
     const list = document.getElementById('product-list');
-    document.getElementById('summary-count').textContent = `${filtered.length} item${filtered.length !== 1 ? 's' : ''}`;
+    document.getElementById('summary-count').textContent =
+      `${filtered.length} item${filtered.length !== 1 ? 's' : ''}` +
+      (totalPages > 1 ? ` · page ${currentPage}/${totalPages}` : '');
 
     if (!filtered.length) {
       list.innerHTML = '<div class="empty-state">No items match these filters.</div>';
+      document.getElementById('pagination').innerHTML = '';
       updateBulkBar();
       return;
     }
 
-    list.innerHTML = filtered.map(p => {
+    list.innerHTML = pageItems.map(p => {
       const qty = Number(p.Quantity) || 0;
       const lowClass = qty <= 2 ? 'low' : '';
       const checked = selectedIds.has(p.ID) ? 'checked' : '';
-      const thumb = p.PhotoData
-        ? `<img class="card-thumb" src="${p.PhotoData}" onclick="openModal('${p.ID}')">`
-        : `<div class="card-thumb" onclick="openModal('${p.ID}')"></div>`;
+      // Thumb uses a placeholder div; photo loaded lazily via IntersectionObserver
       return `<div class="product-card">
         <input type="checkbox" class="card-checkbox" ${checked} onchange="toggleSelect('${p.ID}', this.checked)">
-        ${thumb}
+        <div class="card-thumb lazy-thumb" data-id="${p.ID}" onclick="openModal('${p.ID}')"></div>
         <div class="card-body" onclick="openModal('${p.ID}')">
           <div class="pname">${escapeHtml(p.Name || '(unnamed)')}</div>
           <div class="pmeta">${escapeHtml(p.SKU || p.ID)} · ${escapeHtml(p.Category || '—')}</div>
@@ -502,7 +522,72 @@
         <div class="qty-badge ${lowClass}" onclick="openModal('${p.ID}')">${qty}</div>
       </div>`;
     }).join('');
+
+    renderPagination(totalPages);
     updateBulkBar();
+    setupLazyPhotos();
+  }
+
+  function renderPagination(totalPages) {
+    const pag = document.getElementById('pagination');
+    if (totalPages <= 1) { pag.innerHTML = ''; return; }
+    const btnStyle = 'padding:7px 14px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:13px;';
+    const activeBtnStyle = 'padding:7px 14px;border:1px solid var(--gold);background:var(--gold);color:#fff;cursor:default;font-size:13px;';
+    let html = `<button style="${btnStyle}" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Prev</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+      if (totalPages > 7 && Math.abs(i - currentPage) > 2 && i !== 1 && i !== totalPages) {
+        if (i === 2 || i === totalPages - 1) html += `<span style="padding:0 4px;">…</span>`;
+        continue;
+      }
+      html += `<button style="${i === currentPage ? activeBtnStyle : btnStyle}" onclick="goPage(${i})">${i}</button>`;
+    }
+    html += `<button style="${btnStyle}" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Next ›</button>`;
+    pag.innerHTML = html;
+  }
+
+  function goPage(n) {
+    const filtered = getFiltered();
+    const pageSize = Number(document.getElementById('f-pagesize').value) || 50;
+    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+    currentPage = Math.max(1, Math.min(n, totalPages));
+    renderProducts();
+    window.scrollTo(0, 0);
+  }
+
+  // Lazy photo loading — loads photo only when the thumb scrolls into view
+  function setupLazyPhotos() {
+    if (photoObserver) photoObserver.disconnect();
+    photoObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const id = el.dataset.id;
+        if (!id || el.dataset.loaded) return;
+        el.dataset.loaded = '1';
+        photoObserver.unobserve(el);
+        // Check if we already have photo in memory
+        const p = allProducts.find(x => x.ID === id);
+        if (p && p.PhotoData) {
+          applyThumb(el, p.PhotoData);
+        } else if (p) {
+          // Fetch photo from API
+          apiGet('getPhoto', { id }).then(res => {
+            if (res.photo) {
+              p.PhotoData = res.photo; // cache it
+              applyThumb(el, res.photo);
+            }
+          }).catch(() => {});
+        }
+      });
+    }, { rootMargin: '100px' });
+
+    document.querySelectorAll('.lazy-thumb').forEach(el => photoObserver.observe(el));
+  }
+
+  function applyThumb(el, dataUrl) {
+    el.style.backgroundImage = `url(${dataUrl})`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
   }
 
   // ---------- SELECTION / BULK ACTIONS ----------
@@ -514,7 +599,7 @@
     const filtered = getFiltered();
     if (checked) filtered.forEach(p => selectedIds.add(p.ID));
     else filtered.forEach(p => selectedIds.delete(p.ID));
-    renderProducts();
+    renderProducts(); // keep current page
   }
   function clearSelection() {
     selectedIds.clear();
@@ -576,8 +661,23 @@
     document.getElementById('modal-updated').textContent = p.LastUpdated ? new Date(p.LastUpdated).toLocaleString() : '—';
 
     const photoEl = document.getElementById('modal-photo');
-    if (p.PhotoData) { photoEl.src = p.PhotoData; photoEl.style.display = 'block'; }
-    else { photoEl.style.display = 'none'; }
+    photoEl.style.display = 'none';
+    if (p.PhotoData) {
+      photoEl.src = p.PhotoData;
+      photoEl.style.display = 'block';
+    } else {
+      // Fetch photo lazily if not yet loaded
+      apiGet('getPhoto', { id }).then(res => {
+        if (res.photo) {
+          p.PhotoData = res.photo;
+          photoEl.src = res.photo;
+          photoEl.style.display = 'block';
+          // Also update the thumb in the list if visible
+          const thumb = document.querySelector(`.lazy-thumb[data-id="${id}"]`);
+          if (thumb) applyThumb(thumb, res.photo);
+        }
+      }).catch(() => {});
+    }
 
     const qrDiv = document.getElementById('qr-display');
     qrDiv.innerHTML = '';
