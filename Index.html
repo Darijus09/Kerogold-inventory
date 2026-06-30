@@ -147,7 +147,7 @@
   .modal h2 { font-family: Georgia, serif; margin: 0 0 2px; font-size: 20px; }
   .modal .modal-sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
   .modal-close { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); }
-  #modal-photo { width: 100%; max-height: 220px; object-fit: cover; border-radius: 6px; margin-bottom: 12px; display: none; }
+  #modal-photo { width: 100%; max-height: 220px; object-fit: contain; background: #f5f2ed; border-radius: 6px; margin-bottom: 12px; display: none; }
   .qty-control { display: flex; align-items: center; gap: 12px; justify-content: center; margin: 14px 0; }
   .qty-control button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--ink); background: #fff; font-size: 20px; cursor: pointer; }
   .qty-control .qty-number { font-size: 28px; font-weight: 700; min-width: 50px; text-align: center; }
@@ -176,50 +176,7 @@
     cursor: pointer; font-size: 13px; color: var(--muted); margin: 0;
   }
   .photo-input-row input[type=file] { display: none; }
-  #add-photo-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; margin-bottom: 10px; display: none; }
-
-  /* Print label: only this is shown when printing */
-  #print-label { display: none; }
-  @media print {
-    @page {
-      size: 50mm 50mm;
-      margin: 0;
-    }
-    body * { visibility: hidden; }
-    #print-label, #print-label * { visibility: visible; }
-    #print-label {
-      display: flex !important;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: fixed;
-      top: 0; left: 0;
-      width: 50mm; height: 50mm;
-      text-align: center;
-      padding: 2mm;
-      background: #fff;
-    }
-    #print-label-qr {
-      width: 28mm; height: 28mm;
-      display: flex; align-items: center; justify-content: center;
-    }
-    #print-label-qr img,
-    #print-label-qr canvas {
-      width: 28mm !important;
-      height: 28mm !important;
-    }
-    #print-label .pl-name {
-      font-size: 7pt; font-weight: 700;
-      margin: 1mm 0 0.5mm; line-height: 1.2;
-      max-width: 46mm; word-break: break-word;
-    }
-    #print-label .pl-sku {
-      font-size: 6pt; margin: 0 0 0.5mm; color: #333;
-    }
-    #print-label .pl-location {
-      font-size: 6pt; color: #555; margin: 0;
-    }
-  }
+  #add-photo-preview { width: 100%; max-height: 200px; object-fit: contain; background: #f5f2ed; border-radius: 6px; margin-bottom: 10px; display: none; }
 </style>
 </head>
 <body>
@@ -358,13 +315,6 @@
   </div>
 </div>
 
-<!-- Hidden print-only label -->
-<div id="print-label">
-  <div id="print-label-qr"></div>
-  <p class="pl-name" id="pl-name"></p>
-  <p class="pl-sku" id="pl-sku"></p>
-  <p class="pl-location" id="pl-location"></p>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -738,16 +688,57 @@
     pendingPhotoDataUrl = '';
   }
 
-  // ---------- PRINT LABEL (QR + name + SKU + location only) ----------
+  // ---------- PRINT LABEL ----------
   function printLabelFor(product) {
     if (!product) return;
-    document.getElementById('print-label-qr').innerHTML = '';
-    // 106px ≈ 28mm at 96dpi — fits the label
-    new QRCode(document.getElementById('print-label-qr'), { text: product.ID, width: 106, height: 106 });
-    document.getElementById('pl-name').textContent = product.Name || '';
-    document.getElementById('pl-sku').textContent = product.SKU || product.ID;
-    document.getElementById('pl-location').textContent = product.Location ? '📍 ' + product.Location : '';
-    setTimeout(() => window.print(), 150);
+
+    // Generate QR as data URL via a temp canvas
+    const tempDiv = document.createElement('div');
+    tempDiv.style.position = 'fixed';
+    tempDiv.style.left = '-9999px';
+    document.body.appendChild(tempDiv);
+    new QRCode(tempDiv, { text: product.ID, width: 150, height: 150 });
+
+    setTimeout(() => {
+      const canvas = tempDiv.querySelector('canvas');
+      const qrDataUrl = canvas ? canvas.toDataURL() : '';
+      document.body.removeChild(tempDiv);
+
+      const name = product.Name || '';
+      const sku = product.SKU || product.ID;
+      const loc = product.Location || '';
+
+      const win = window.open('', '_blank', 'width=220,height=260,toolbar=0,menubar=0,scrollbars=0');
+      win.document.write(`<!DOCTYPE html>
+<html><head><style>
+  @page { size: 50mm 60mm; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 50mm;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    background: #fff;
+    padding: 10px;
+  }
+  img { width: 38mm; height: 38mm; display: block; margin: 0 auto; }
+  .name { font-size: 7pt; font-weight: 700; margin-top: 4px; line-height: 1.3; }
+  .sku  { font-size: 6pt; color: #444; margin-top: 3px; }
+  .loc  { font-size: 6pt; color: #666; margin-top: 2px; }
+  .print-btn {
+    display: block; width: 100%; margin-top: 12px; padding: 8px;
+    background: #1c1b19; color: #fff; border: none;
+    font-size: 13px; cursor: pointer;
+  }
+  @media print { .print-btn { display: none; } }
+</style></head><body>
+  <img src="${qrDataUrl}">
+  <div class="name">${name}</div>
+  <div class="sku">${sku}</div>
+  ${loc ? `<div class="loc">${loc}</div>` : ''}
+  <button class="print-btn" onclick="window.print()">Print label</button>
+</body></html>`);
+      win.document.close();
+    }, 200);
   }
 
   // ---------- SCAN ----------
