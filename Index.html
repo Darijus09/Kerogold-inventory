@@ -156,7 +156,7 @@
   .qty-set-row button { width: auto; padding: 10px 14px; white-space: nowrap; }
   .detail-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f0ece4; }
   .detail-row span:first-child { color: var(--muted); }
-  #qr-display { text-align: center; margin: 14px 0; }
+  #qr-display { text-align: center; margin: 14px auto; display: flex; justify-content: center; }
 
   #reader { width: 100%; max-width: 420px; margin: 0 auto; }
   .scan-hint { text-align: center; color: var(--muted); font-size: 13px; margin-top: 10px; }
@@ -181,16 +181,44 @@
   /* Print label: only this is shown when printing */
   #print-label { display: none; }
   @media print {
+    @page {
+      size: 50mm 50mm;
+      margin: 0;
+    }
     body * { visibility: hidden; }
     #print-label, #print-label * { visibility: visible; }
     #print-label {
-      display: block;
-      position: absolute; top: 0; left: 0; width: 100%;
-      text-align: center; padding: 20px;
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: fixed;
+      top: 0; left: 0;
+      width: 50mm; height: 50mm;
+      text-align: center;
+      padding: 2mm;
+      background: #fff;
     }
-    #print-label .pl-name { font-size: 16px; font-weight: 700; margin: 8px 0 2px; }
-    #print-label .pl-sku { font-size: 13px; margin: 0 0 2px; }
-    #print-label .pl-location { font-size: 12px; color: #444; margin: 0; }
+    #print-label-qr {
+      width: 28mm; height: 28mm;
+      display: flex; align-items: center; justify-content: center;
+    }
+    #print-label-qr img,
+    #print-label-qr canvas {
+      width: 28mm !important;
+      height: 28mm !important;
+    }
+    #print-label .pl-name {
+      font-size: 7pt; font-weight: 700;
+      margin: 1mm 0 0.5mm; line-height: 1.2;
+      max-width: 46mm; word-break: break-word;
+    }
+    #print-label .pl-sku {
+      font-size: 6pt; margin: 0 0 0.5mm; color: #333;
+    }
+    #print-label .pl-location {
+      font-size: 6pt; color: #555; margin: 0;
+    }
   }
 </style>
 </head>
@@ -714,11 +742,12 @@
   function printLabelFor(product) {
     if (!product) return;
     document.getElementById('print-label-qr').innerHTML = '';
-    new QRCode(document.getElementById('print-label-qr'), { text: product.ID, width: 150, height: 150 });
+    // 106px ≈ 28mm at 96dpi — fits the label
+    new QRCode(document.getElementById('print-label-qr'), { text: product.ID, width: 106, height: 106 });
     document.getElementById('pl-name').textContent = product.Name || '';
     document.getElementById('pl-sku').textContent = product.SKU || product.ID;
-    document.getElementById('pl-location').textContent = product.Location || '';
-    setTimeout(() => window.print(), 100); // let QR canvas render first
+    document.getElementById('pl-location').textContent = product.Location ? '📍 ' + product.Location : '';
+    setTimeout(() => window.print(), 150);
   }
 
   // ---------- SCAN ----------
