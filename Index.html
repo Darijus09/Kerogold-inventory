@@ -302,6 +302,11 @@
       <input type="number" id="modal-qty-set" placeholder="Set exact quantity">
       <button class="secondary" onclick="applySetQty()">Set</button>
     </div>
+    <div class="qty-set-row">
+      <input type="number" id="modal-qty-change" placeholder="Pieces to add or remove" min="1">
+      <button class="secondary" style="width:auto;padding:10px 12px;color:var(--green);border-color:var(--green);" onclick="applyModalChange(1)">+ Add</button>
+      <button class="secondary" style="width:auto;padding:10px 12px;color:var(--red);border-color:var(--red);" onclick="applyModalChange(-1)">− Remove</button>
+    </div>
 
     <div class="detail-row"><span>Category</span><span id="modal-category"></span></div>
     <div class="detail-row"><span>Material</span><span id="modal-material"></span></div>
@@ -527,16 +532,27 @@
   }
   async function applyBulk(sign) {
     const amount = Math.abs(Number(document.getElementById('bulk-amount').value)) || 1;
-    const delta = sign * amount;
     const ids = [...selectedIds];
     if (!ids.length) return;
+
+    // Calculate new quantities on the frontend using allProducts (which we know is correct)
+    // then call setQuantity so the server just writes the value, no read needed
+    const updates = ids.map(id => {
+      const p = allProducts.find(x => x.ID === id);
+      const currentQty = Number(p ? p.Quantity : 0);
+      const newQty = Math.max(0, currentQty + (sign * amount));
+      return { id, newQty };
+    });
+
     showToast('Updating…');
     try {
-      const res = await apiPost('bulkAdjustQuantity', { ids, delta, username: currentUser ? currentUser.username : '' });
-      if (res.error) throw new Error(res.error);
+      // Run all setQuantity calls in parallel
+      await Promise.all(updates.map(u =>
+        apiPost('setQuantity', { id: u.id, quantity: u.newQty, username: currentUser ? currentUser.username : '' })
+      ));
       showToast(`${sign > 0 ? 'Added' : 'Removed'} ${amount} on ${ids.length} item${ids.length !== 1 ? 's' : ''}`);
       clearSelection();
-      await loadProducts(); // reload fresh from sheet so display is always accurate
+      await loadProducts();
     } catch (err) {
       showToast('Bulk update failed: ' + err.message);
     }
@@ -579,21 +595,17 @@
   async function changeQty(delta) {
     if (!activeModalId) return;
     const qtyEl = document.getElementById('modal-qty');
-    const newLocalQty = Math.max(0, Number(qtyEl.textContent) + delta);
-    qtyEl.textContent = newLocalQty;
+    const newQty = Math.max(0, Number(qtyEl.textContent) + delta);
+    qtyEl.textContent = newQty;
     try {
-      const res = await apiPost('adjustQuantity', { id: activeModalId, delta, username: currentUser ? currentUser.username : '' });
+      const res = await apiPost('setQuantity', { id: activeModalId, quantity: newQty, username: currentUser ? currentUser.username : '' });
       if (res.ok) {
         const p = allProducts.find(x => x.ID === activeModalId);
         if (p) p.Quantity = res.newQuantity;
         renderProducts();
         showToast(delta > 0 ? 'Added 1' : 'Removed 1');
-      } else {
-        showToast('Error: ' + (res.error || 'could not update'));
       }
-    } catch (err) {
-      showToast('Network error — change not saved');
-    }
+    } catch (err) { showToast('Network error — change not saved'); }
   }
 
   async function applySetQty() {
@@ -609,12 +621,27 @@
         if (p) p.Quantity = res.newQuantity;
         renderProducts();
         showToast('Quantity set to ' + res.newQuantity);
-      } else {
-        showToast('Error: ' + (res.error || 'could not update'));
       }
-    } catch (err) {
-      showToast('Network error — change not saved');
-    }
+    } catch (err) { showToast('Network error — change not saved'); }
+  }
+
+  async function applyModalChange(sign) {
+    if (!activeModalId) return;
+    const amount = Math.abs(Number(document.getElementById('modal-qty-change').value));
+    if (!amount || amount < 1) { showToast('Enter how many pieces'); return; }
+    const qtyEl = document.getElementById('modal-qty');
+    const newQty = Math.max(0, Number(qtyEl.textContent) + (sign * amount));
+    qtyEl.textContent = newQty;
+    document.getElementById('modal-qty-change').value = '';
+    try {
+      const res = await apiPost('setQuantity', { id: activeModalId, quantity: newQty, username: currentUser ? currentUser.username : '' });
+      if (res.ok) {
+        const p = allProducts.find(x => x.ID === activeModalId);
+        if (p) p.Quantity = res.newQuantity;
+        renderProducts();
+        showToast(sign > 0 ? `Added ${amount}` : `Removed ${amount}`);
+      }
+    } catch (err) { showToast('Network error — change not saved'); }
   }
 
   // ---------- PHOTO CAPTURE (Add form) ----------
