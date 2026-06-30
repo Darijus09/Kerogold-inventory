@@ -69,23 +69,6 @@
   .screen { display: none; }
   .screen.active { display: block; }
 
-  #setup-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .setup-card {
-    background: #fff;
-    border: 1px solid var(--line);
-    padding: 28px;
-    width: 100%;
-    max-width: 420px;
-  }
-  .setup-card h1 { font-family: Georgia, serif; font-size: 20px; margin: 0 0 6px; }
-  .setup-card p { font-size: 13px; color: var(--muted); margin: 0 0 16px; }
-
   #login-screen {
     min-height: 100vh;
     display: flex;
@@ -233,19 +216,8 @@
 </head>
 <body>
 
-<!-- ONE-TIME SETUP SCREEN: enter your Apps Script API URL -->
-<div id="setup-screen" class="screen active">
-  <div class="setup-card">
-    <h1>Connect to your inventory</h1>
-    <p>Paste the Apps Script web app URL from your deployment (ends in <code>/exec</code>). This is saved in this browser only — you only need to do this once per device.</p>
-    <input id="setup-url" placeholder="https://script.google.com/macros/s/.../exec">
-    <div class="error-text" id="setup-error"></div>
-    <button class="primary" onclick="saveApiUrl()">Connect</button>
-  </div>
-</div>
-
 <!-- LOGIN -->
-<div id="login-screen" class="screen">
+<div id="login-screen" class="screen active">
   <div class="login-card">
     <h1>Inventory</h1>
     <p class="sub">Sign in to manage stock</p>
@@ -253,7 +225,6 @@
     <input id="login-pass" type="password" placeholder="Password" autocomplete="current-password">
     <div class="error-text" id="login-error"></div>
     <button class="primary" onclick="doLogin()">Sign in</button>
-    <button class="secondary" style="margin-top:10px;" onclick="resetApiUrl()">Change API URL</button>
   </div>
 </div>
 
@@ -358,7 +329,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-  let API_URL = localStorage.getItem('jw_api_url') || '';
+  let API_URL = 'https://script.google.com/macros/s/AKfycbxiMjDNGpP-MldfUaOScaMezr0eaNcH_oqYhTAzytKxYiNPwv42acXPT3yELv5gl3kZOw/exec';
   let currentUser = JSON.parse(localStorage.getItem('jw_user') || 'null');
   let allProducts = [];
   let activeModalId = null;
@@ -367,10 +338,6 @@
 
   // ---------- BOOT ----------
   function boot() {
-    if (!API_URL) {
-      show('setup-screen');
-      return;
-    }
     if (currentUser) {
       document.getElementById('user-chip').textContent = currentUser.username + ' · Sign out';
       show('app-screen');
@@ -380,25 +347,13 @@
     }
   }
   function show(id) {
-    document.querySelectorAll('body > .screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  }
-
-  function saveApiUrl() {
-    const url = document.getElementById('setup-url').value.trim();
-    if (!url.startsWith('https://') || !url.includes('script.google')) {
-      document.getElementById('setup-error').textContent = 'That doesn\'t look like an Apps Script web app URL.';
-      return;
-    }
-    API_URL = url.replace(/\/$/, '');
-    localStorage.setItem('jw_api_url', API_URL);
-    show('login-screen');
-  }
-
-  function resetApiUrl() {
-    localStorage.removeItem('jw_api_url');
-    API_URL = '';
-    show('setup-screen');
+    document.querySelectorAll('body > .screen').forEach(s => {
+      s.classList.remove('active');
+      s.style.display = 'none';
+    });
+    const target = document.getElementById(id);
+    target.classList.add('active');
+    target.style.display = '';
   }
 
   // ---------- API HELPERS ----------
@@ -654,7 +609,6 @@
   }
 
   document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  document.getElementById('setup-url').addEventListener('keydown', e => { if (e.key === 'Enter') saveApiUrl(); });
 
   boot();
 </script>
