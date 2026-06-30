@@ -294,10 +294,11 @@
 <!-- Bulk action bar -->
 <div class="bulk-bar" id="bulk-bar">
   <div class="bulk-count" id="bulk-count">0 selected</div>
-  <input type="number" id="bulk-amount" value="1" min="1">
-  <button onclick="applyBulk(1)">+ Add</button>
-  <button onclick="applyBulk(-1)">− Remove</button>
-  <button class="clear" onclick="clearSelection()">Clear</button>
+  <span style="font-size:12px; color:#aaa;">Pieces:</span>
+  <input type="number" id="bulk-amount" value="1" min="1" style="width:60px;">
+  <button onclick="applyBulk(1)">+ Add to stock</button>
+  <button onclick="applyBulk(-1)">− Remove from stock</button>
+  <button class="clear" onclick="clearSelection()">✕ Clear</button>
 </div>
 
 <div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -505,8 +506,8 @@
       const qty = Number(p.Quantity) || 0;
       const lowClass = qty <= 2 ? 'low' : '';
       const checked = selectedIds.has(p.ID) ? 'checked' : '';
-      const thumb = p.PhotoURL
-        ? `<img class="card-thumb" src="${escapeHtml(p.PhotoURL)}" onclick="openModal('${p.ID}')">`
+      const thumb = p.PhotoData
+        ? `<img class="card-thumb" src="${p.PhotoData}" onclick="openModal('${p.ID}')">`
         : `<div class="card-thumb" onclick="openModal('${p.ID}')"></div>`;
       return `<div class="product-card">
         <input type="checkbox" class="card-checkbox" ${checked} onchange="toggleSelect('${p.ID}', this.checked)">
@@ -585,7 +586,7 @@
     document.getElementById('modal-updated').textContent = p.LastUpdated ? new Date(p.LastUpdated).toLocaleString() : '—';
 
     const photoEl = document.getElementById('modal-photo');
-    if (p.PhotoURL) { photoEl.src = p.PhotoURL; photoEl.style.display = 'block'; }
+    if (p.PhotoData) { photoEl.src = p.PhotoData; photoEl.style.display = 'block'; }
     else { photoEl.style.display = 'none'; }
 
     const qrDiv = document.getElementById('qr-display');
@@ -650,15 +651,15 @@
     const reader = new FileReader();
     reader.onload = e => {
       img.onload = () => {
-        // Resize/compress so the upload stays small
-        const maxDim = 900;
+        // Resize/compress to max 300px so it fits in a Sheets cell
+        const maxDim = 300;
         let { width, height } = img;
         if (width > height && width > maxDim) { height *= maxDim / width; width = maxDim; }
         else if (height > maxDim) { width *= maxDim / height; height = maxDim; }
         const canvas = document.createElement('canvas');
         canvas.width = width; canvas.height = height;
         canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        pendingPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        pendingPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.75);
         const preview = document.getElementById('add-photo-preview');
         preview.src = pendingPhotoDataUrl;
         preview.style.display = 'block';
