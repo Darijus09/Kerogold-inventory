@@ -147,7 +147,7 @@
   .modal h2 { font-family: Georgia, serif; margin: 0 0 2px; font-size: 20px; }
   .modal .modal-sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
   .modal-close { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); }
-  #modal-photo { width: 100%; max-height: 220px; object-fit: contain; background: #f5f2ed; border-radius: 6px; margin-bottom: 12px; display: none; }
+  #modal-photo { width: 100%; height: 200px; object-fit: contain; object-position: center; background: #f5f2ed; border-radius: 6px; margin-bottom: 12px; display: none; }
   .qty-control { display: flex; align-items: center; gap: 12px; justify-content: center; margin: 14px 0; }
   .qty-control button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--ink); background: #fff; font-size: 20px; cursor: pointer; }
   .qty-control .qty-number { font-size: 28px; font-weight: 700; min-width: 50px; text-align: center; }
@@ -692,53 +692,67 @@
   function printLabelFor(product) {
     if (!product) return;
 
-    // Generate QR as data URL via a temp canvas
     const tempDiv = document.createElement('div');
-    tempDiv.style.position = 'fixed';
-    tempDiv.style.left = '-9999px';
+    tempDiv.style.cssText = 'position:fixed;left:-9999px;top:0';
     document.body.appendChild(tempDiv);
-    new QRCode(tempDiv, { text: product.ID, width: 150, height: 150 });
+    new QRCode(tempDiv, { text: product.ID, width: 180, height: 180 });
 
     setTimeout(() => {
       const canvas = tempDiv.querySelector('canvas');
       const qrDataUrl = canvas ? canvas.toDataURL() : '';
       document.body.removeChild(tempDiv);
 
-      const name = product.Name || '';
-      const sku = product.SKU || product.ID;
-      const loc = product.Location || '';
+      const name = (product.Name || '').replace(/</g,'&lt;');
+      const sku  = (product.SKU || product.ID).replace(/</g,'&lt;');
+      const loc  = (product.Location || '').replace(/</g,'&lt;');
 
-      const win = window.open('', '_blank', 'width=220,height=260,toolbar=0,menubar=0,scrollbars=0');
+      const win = window.open('', '_blank', 'width=300,height=380,toolbar=0,menubar=0,scrollbars=0,resizable=0');
+      if (!win) { showToast('Allow popups for this site to print labels'); return; }
+
       win.document.write(`<!DOCTYPE html>
-<html><head><style>
-  @page { size: 50mm 60mm; margin: 0; }
+<html><head><meta charset="UTF-8"><style>
+  @page {
+    size: 50mm 62mm;
+    margin: 0;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
+  html, body {
     width: 50mm;
-    font-family: 'Segoe UI', sans-serif;
-    text-align: center;
     background: #fff;
-    padding: 10px;
+    font-family: Arial, sans-serif;
   }
-  img { width: 38mm; height: 38mm; display: block; margin: 0 auto; }
-  .name { font-size: 7pt; font-weight: 700; margin-top: 4px; line-height: 1.3; }
-  .sku  { font-size: 6pt; color: #444; margin-top: 3px; }
-  .loc  { font-size: 6pt; color: #666; margin-top: 2px; }
+  .label {
+    width: 50mm;
+    padding: 3mm 2mm 2mm;
+    text-align: center;
+  }
+  .label img {
+    width: 44mm; height: 44mm;
+    display: block; margin: 0 auto;
+  }
+  .name { font-size: 8pt; font-weight: bold; margin-top: 2mm; line-height: 1.3; }
+  .sku  { font-size: 7pt; color: #333; margin-top: 1mm; }
+  .loc  { font-size: 7pt; color: #555; margin-top: 1mm; }
   .print-btn {
-    display: block; width: 100%; margin-top: 12px; padding: 8px;
+    display: block; width: 100%; margin-top: 4mm; padding: 3mm;
     background: #1c1b19; color: #fff; border: none;
-    font-size: 13px; cursor: pointer;
+    font-size: 12pt; cursor: pointer; font-family: Arial, sans-serif;
   }
-  @media print { .print-btn { display: none; } }
+  @media print {
+    .print-btn { display: none !important; }
+    html, body { width: 50mm; }
+  }
 </style></head><body>
+<div class="label">
   <img src="${qrDataUrl}">
   <div class="name">${name}</div>
   <div class="sku">${sku}</div>
   ${loc ? `<div class="loc">${loc}</div>` : ''}
-  <button class="print-btn" onclick="window.print()">Print label</button>
+</div>
+<button class="print-btn" onclick="window.print()">🖨 Print label</button>
 </body></html>`);
       win.document.close();
-    }, 200);
+    }, 250);
   }
 
   // ---------- SCAN ----------
