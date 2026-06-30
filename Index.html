@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jewelry Inventory</title>
+<style>
+  :root {
+    --ink: #1c1b19;
+    --paper: #faf7f2;
+    --gold: #a8823c;
+    --gold-deep: #8a6a2e;
+    --line: #e3ddd1;
+    --green: #2f4a3c;
+    --red: #9c3b3b;
+    --muted: #74695c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  header.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  header.topbar h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 19px;
+    letter-spacing: 0.5px;
+    margin: 0;
+    font-weight: 600;
+  }
+  header.topbar .user-chip {
+    font-size: 12px;
+    color: var(--gold);
+    cursor: pointer;
+  }
+  nav.tabs {
+    display: flex;
+    background: #fff;
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  nav.tabs button {
+    flex: 1;
+    padding: 12px 6px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  nav.tabs button.active {
+    color: var(--ink);
+    border-bottom: 2px solid var(--gold);
+    font-weight: 600;
+  }
+  main { padding: 16px; max-width: 760px; margin: 0 auto; padding-bottom: 80px; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  #setup-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .setup-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 28px;
+    width: 100%;
+    max-width: 420px;
+  }
+  .setup-card h1 { font-family: Georgia, serif; font-size: 20px; margin: 0 0 6px; }
+  .setup-card p { font-size: 13px; color: var(--muted); margin: 0 0 16px; }
+
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .login-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 32px 28px;
+    width: 100%;
+    max-width: 320px;
+    text-align: center;
+  }
+  .login-card h1 {
+    font-family: Georgia, serif;
+    margin: 0 0 4px;
+    font-size: 22px;
+  }
+  .login-card p.sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+
+  input, select, textarea {
+    width: 100%;
+    padding: 10px 11px;
+    border: 1px solid var(--line);
+    background: #fff;
+    font-size: 14px;
+    margin-bottom: 10px;
+    border-radius: 2px;
+    font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
+  button.primary {
+    width: 100%;
+    padding: 11px;
+    background: var(--ink);
+    color: var(--paper);
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+  }
+  button.primary:hover { background: var(--gold-deep); }
+  button.secondary {
+    width: 100%;
+    padding: 10px;
+    background: none;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .error-text { color: var(--red); font-size: 12px; margin: -4px 0 10px; }
+
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filters input, .filters select { margin-bottom: 0; flex: 1; min-width: 110px; }
+
+  .summary-bar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 8px;
+  }
+
+  .product-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .product-card:hover { border-color: var(--gold); }
+  .product-card .pname { font-weight: 600; font-size: 14px; }
+  .product-card .pmeta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .qty-badge {
+    font-size: 13px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background: #eef3ee;
+    color: var(--green);
+    white-space: nowrap;
+  }
+  .qty-badge.low { background: #f7e9e9; color: var(--red); }
+
+  .modal-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 100;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .modal-backdrop.active { display: flex; }
+  .modal {
+    background: #fff;
+    width: 100%;
+    max-width: 480px;
+    padding: 22px;
+    border-radius: 10px 10px 0 0;
+    max-height: 88vh;
+    overflow-y: auto;
+  }
+  .modal h2 { font-family: Georgia, serif; margin: 0 0 2px; font-size: 20px; }
+  .modal .modal-sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
+  .modal-close { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); }
+  .qty-control { display: flex; align-items: center; gap: 12px; justify-content: center; margin: 18px 0; }
+  .qty-control button {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--ink);
+    background: #fff;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  .qty-control .qty-number { font-size: 28px; font-weight: 700; min-width: 50px; text-align: center; }
+  .detail-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f0ece4; }
+  .detail-row span:first-child { color: var(--muted); }
+  #qr-display { text-align: center; margin: 14px 0; }
+
+  #reader { width: 100%; max-width: 420px; margin: 0 auto; }
+  .scan-hint { text-align: center; color: var(--muted); font-size: 13px; margin-top: 10px; }
+
+  .toast {
+    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+    background: var(--ink); color: #fff; padding: 10px 18px;
+    border-radius: 20px; font-size: 13px; opacity: 0; transition: opacity 0.25s;
+    pointer-events: none; z-index: 200;
+  }
+  .toast.show { opacity: 1; }
+  .empty-state { text-align: center; color: var(--muted); padding: 40px 10px; font-size: 14px; }
+  .spinner-wrap { text-align: center; padding: 30px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- ONE-TIME SETUP SCREEN: enter your Apps Script API URL -->
+<div id="setup-screen" class="screen active">
+  <div class="setup-card">
+    <h1>Connect to your inventory</h1>
+    <p>Paste the Apps Script web app URL from your deployment (ends in <code>/exec</code>). This is saved in this browser only — you only need to do this once per device.</p>
+    <input id="setup-url" placeholder="https://script.google.com/macros/s/.../exec">
+    <div class="error-text" id="setup-error"></div>
+    <button class="primary" onclick="saveApiUrl()">Connect</button>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen" class="screen">
+  <div class="login-card">
+    <h1>Inventory</h1>
+    <p class="sub">Sign in to manage stock</p>
+    <input id="login-user" placeholder="Username" autocomplete="username">
+    <input id="login-pass" type="password" placeholder="Password" autocomplete="current-password">
+    <div class="error-text" id="login-error"></div>
+    <button class="primary" onclick="doLogin()">Sign in</button>
+    <button class="secondary" style="margin-top:10px;" onclick="resetApiUrl()">Change API URL</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen" class="screen">
+  <header class="topbar">
+    <h1>Jewelry Inventory</h1>
+    <span class="user-chip" id="user-chip" onclick="doLogout()">Sign out</span>
+  </header>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="inventory" onclick="switchTab('inventory')">Inventory</button>
+    <button class="tab-btn" data-tab="scan" onclick="switchTab('scan')">Scan</button>
+    <button class="tab-btn" data-tab="add" onclick="switchTab('add')">Add item</button>
+  </nav>
+
+  <main>
+    <div id="inventory" class="screen active">
+      <div class="filters">
+        <input id="f-search" placeholder="Search name / SKU" oninput="renderProducts()">
+        <select id="f-category" onchange="renderProducts()"><option value="">All categories</option></select>
+        <select id="f-location" onchange="renderProducts()"><option value="">All locations</option></select>
+        <select id="f-stock" onchange="renderProducts()">
+          <option value="">All stock</option>
+          <option value="instock">In stock</option>
+          <option value="low">Low (≤2)</option>
+          <option value="out">Out of stock</option>
+        </select>
+      </div>
+      <div class="summary-bar">
+        <span id="summary-count">—</span>
+        <span id="summary-value"></span>
+      </div>
+      <div id="product-list"><div class="spinner-wrap">Loading inventory…</div></div>
+    </div>
+
+    <div id="scan" class="screen">
+      <div id="reader"></div>
+      <p class="scan-hint" id="scan-hint">Point the camera at a product's QR code.</p>
+    </div>
+
+    <div id="add" class="screen">
+      <label>Product name</label>
+      <input id="add-name" placeholder="e.g. Gold hoop earrings">
+      <label>SKU (optional — leave blank to auto-fill)</label>
+      <input id="add-sku" placeholder="e.g. ER-014">
+      <label>Category</label>
+      <input id="add-category" placeholder="e.g. Earrings, Rings, Necklaces">
+      <label>Material</label>
+      <input id="add-material" placeholder="e.g. 18k gold, sterling silver">
+      <label>Gemstone</label>
+      <input id="add-gemstone" placeholder="e.g. diamond, none">
+      <label>Weight (g)</label>
+      <input id="add-weight" type="number" step="0.01">
+      <label>Starting quantity</label>
+      <input id="add-quantity" type="number" value="1">
+      <label>Price</label>
+      <input id="add-price" type="number" step="0.01">
+      <label>Location / shelf</label>
+      <input id="add-location" placeholder="e.g. Display case 2">
+      <label>Notes</label>
+      <textarea id="add-notes" rows="2"></textarea>
+      <button class="primary" onclick="submitAddProduct()">Save & generate QR code</button>
+
+      <div id="new-product-result" style="display:none; margin-top:24px; text-align:center; border-top:1px solid var(--line); padding-top:20px;">
+        <p style="font-size:13px; color:var(--muted);">Item saved. Print this label and attach it to the product.</p>
+        <div id="new-qr"></div>
+        <p id="new-product-id" style="font-weight:600; margin-top:8px;"></p>
+        <button class="secondary" onclick="window.print()">Print label</button>
+        <button class="secondary" style="margin-top:8px;" onclick="resetAddForm()">Add another item</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <h2 id="modal-name"></h2>
+    <p class="modal-sub" id="modal-sku"></p>
+
+    <div class="qty-control">
+      <button onclick="changeQty(-1)">−</button>
+      <div class="qty-number" id="modal-qty">0</div>
+      <button onclick="changeQty(1)">+</button>
+    </div>
+
+    <div class="detail-row"><span>Category</span><span id="modal-category"></span></div>
+    <div class="detail-row"><span>Material</span><span id="modal-material"></span></div>
+    <div class="detail-row"><span>Gemstone</span><span id="modal-gemstone"></span></div>
+    <div class="detail-row"><span>Weight</span><span id="modal-weight"></span></div>
+    <div class="detail-row"><span>Price</span><span id="modal-price"></span></div>
+    <div class="detail-row"><span>Location</span><span id="modal-location"></span></div>
+    <div class="detail-row"><span>Last updated</span><span id="modal-updated"></span></div>
+
+    <div id="qr-display"></div>
+    <button class="secondary" onclick="window.print()">Print QR label</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+  let API_URL = localStorage.getItem('jw_api_url') || '';
+  let currentUser = JSON.parse(localStorage.getItem('jw_user') || 'null');
+  let allProducts = [];
+  let activeModalId = null;
+  let html5QrCode = null;
+  let scanCooldown = false;
+
+  // ---------- BOOT ----------
+  function boot() {
+    if (!API_URL) {
+      show('setup-screen');
+      return;
+    }
+    if (currentUser) {
+      document.getElementById('user-chip').textContent = currentUser.username + ' · Sign out';
+      show('app-screen');
+      loadProducts();
+    } else {
+      show('login-screen');
+    }
+  }
+  function show(id) {
+    document.querySelectorAll('body > .screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function saveApiUrl() {
+    const url = document.getElementById('setup-url').value.trim();
+    if (!url.startsWith('https://') || !url.includes('script.google')) {
+      document.getElementById('setup-error').textContent = 'That doesn\'t look like an Apps Script web app URL.';
+      return;
+    }
+    API_URL = url.replace(/\/$/, '');
+    localStorage.setItem('jw_api_url', API_URL);
+    show('login-screen');
+  }
+
+  function resetApiUrl() {
+    localStorage.removeItem('jw_api_url');
+    API_URL = '';
+    show('setup-screen');
+  }
+
+  // ---------- API HELPERS ----------
+  async function apiGet(action, params) {
+    const qs = new URLSearchParams({ action, ...(params || {}) });
+    const res = await fetch(`${API_URL}?${qs.toString()}`);
+    return res.json();
+  }
+  async function apiPost(action, payload) {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight
+      body: JSON.stringify({ action, ...(payload || {}) })
+    });
+    return res.json();
+  }
+
+  // ---------- LOGIN ----------
+  async function doLogin() {
+    const u = document.getElementById('login-user').value.trim();
+    const p = document.getElementById('login-pass').value;
+    if (!u || !p) {
+      document.getElementById('login-error').textContent = 'Enter a username and password.';
+      return;
+    }
+    document.getElementById('login-error').textContent = 'Signing in…';
+    try {
+      const res = await apiPost('authenticate', { username: u, password: p });
+      if (res.ok) {
+        currentUser = res;
+        localStorage.setItem('jw_user', JSON.stringify(res));
+        document.getElementById('user-chip').textContent = res.username + ' · Sign out';
+        document.getElementById('login-error').textContent = '';
+        show('app-screen');
+        loadProducts();
+      } else {
+        document.getElementById('login-error').textContent = 'Incorrect username or password.';
+      }
+    } catch (err) {
+      document.getElementById('login-error').textContent = 'Could not reach the API. Check the URL and your connection.';
+    }
+  }
+
+  function doLogout() {
+    currentUser = null;
+    localStorage.removeItem('jw_user');
+    show('login-screen');
+  }
+
+  // ---------- TABS ----------
+  function switchTab(tab) {
+    document.querySelectorAll('main > .screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    if (tab === 'scan') startScanner();
+    else stopScanner();
+  }
+
+  // ---------- INVENTORY ----------
+  async function loadProducts() {
+    document.getElementById('product-list').innerHTML = '<div class="spinner-wrap">Loading inventory…</div>';
+    try {
+      const products = await apiGet('getProducts');
+      if (products.error) throw new Error(products.error);
+      allProducts = products;
+      populateFilterOptions();
+      renderProducts();
+    } catch (err) {
+      document.getElementById('product-list').innerHTML =
+        `<div class="empty-state">Could not load inventory.<br>${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  function populateFilterOptions() {
+    const cats = [...new Set(allProducts.map(p => p.Category).filter(Boolean))].sort();
+    const locs = [...new Set(allProducts.map(p => p.Location).filter(Boolean))].sort();
+    document.getElementById('f-category').innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option>${c}</option>`).join('');
+    document.getElementById('f-location').innerHTML = '<option value="">All locations</option>' + locs.map(l => `<option>${l}</option>`).join('');
+  }
+
+  function renderProducts() {
+    const search = document.getElementById('f-search').value.toLowerCase();
+    const cat = document.getElementById('f-category').value;
+    const loc = document.getElementById('f-location').value;
+    const stockFilter = document.getElementById('f-stock').value;
+
+    let filtered = allProducts.filter(p => {
+      if (search && !(`${p.Name} ${p.SKU}`.toLowerCase().includes(search))) return false;
+      if (cat && p.Category !== cat) return false;
+      if (loc && p.Location !== loc) return false;
+      const qty = Number(p.Quantity) || 0;
+      if (stockFilter === 'instock' && qty <= 0) return false;
+      if (stockFilter === 'low' && !(qty > 0 && qty <= 2)) return false;
+      if (stockFilter === 'out' && qty > 0) return false;
+      return true;
+    });
+
+    const list = document.getElementById('product-list');
+    document.getElementById('summary-count').textContent = `${filtered.length} item${filtered.length !== 1 ? 's' : ''}`;
+    const totalValue = filtered.reduce((s, p) => s + (Number(p.Price) || 0) * (Number(p.Quantity) || 0), 0);
+    document.getElementById('summary-value').textContent = totalValue ? `Value: ${totalValue.toLocaleString(undefined, {maximumFractionDigits:0})}` : '';
+
+    if (!filtered.length) {
+      list.innerHTML = '<div class="empty-state">No items match these filters.</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(p => {
+      const qty = Number(p.Quantity) || 0;
+      const lowClass = qty <= 2 ? 'low' : '';
+      return `<div class="product-card" onclick="openModal('${p.ID}')">
+        <div>
+          <div class="pname">${escapeHtml(p.Name || '(unnamed)')}</div>
+          <div class="pmeta">${escapeHtml(p.SKU || p.ID)} · ${escapeHtml(p.Category || '—')}</div>
+        </div>
+        <div class="qty-badge ${lowClass}">${qty}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // ---------- MODAL ----------
+  function openModal(id) {
+    const p = allProducts.find(x => x.ID === id);
+    if (!p) return;
+    activeModalId = id;
+    document.getElementById('modal-name').textContent = p.Name || '(unnamed)';
+    document.getElementById('modal-sku').textContent = (p.SKU || p.ID);
+    document.getElementById('modal-qty').textContent = Number(p.Quantity) || 0;
+    document.getElementById('modal-category').textContent = p.Category || '—';
+    document.getElementById('modal-material').textContent = p.Material || '—';
+    document.getElementById('modal-gemstone').textContent = p.Gemstone || '—';
+    document.getElementById('modal-weight').textContent = p.WeightGrams ? p.WeightGrams + ' g' : '—';
+    document.getElementById('modal-price').textContent = p.Price || '—';
+    document.getElementById('modal-location').textContent = p.Location || '—';
+    document.getElementById('modal-updated').textContent = p.LastUpdated ? new Date(p.LastUpdated).toLocaleString() : '—';
+
+    const qrDiv = document.getElementById('qr-display');
+    qrDiv.innerHTML = '';
+    new QRCode(qrDiv, { text: p.ID, width: 140, height: 140 });
+
+    document.getElementById('modal-backdrop').classList.add('active');
+  }
+
+  function closeModal() {
+    document.getElementById('modal-backdrop').classList.remove('active');
+    activeModalId = null;
+  }
+
+  async function changeQty(delta) {
+    if (!activeModalId) return;
+    const qtyEl = document.getElementById('modal-qty');
+    const newLocalQty = Math.max(0, Number(qtyEl.textContent) + delta);
+    qtyEl.textContent = newLocalQty;
+    try {
+      const res = await apiPost('adjustQuantity', { id: activeModalId, delta, username: currentUser ? currentUser.username : '' });
+      if (res.ok) {
+        const p = allProducts.find(x => x.ID === activeModalId);
+        if (p) p.Quantity = res.newQuantity;
+        renderProducts();
+        showToast(delta > 0 ? 'Added 1' : 'Removed 1');
+      } else {
+        showToast('Error: ' + (res.error || 'could not update'));
+      }
+    } catch (err) {
+      showToast('Network error — change not saved');
+    }
+  }
+
+  // ---------- ADD PRODUCT ----------
+  async function submitAddProduct() {
+    const name = document.getElementById('add-name').value.trim();
+    if (!name) { showToast('Enter a product name'); return; }
+    const product = {
+      name: name,
+      sku: document.getElementById('add-sku').value.trim(),
+      category: document.getElementById('add-category').value.trim(),
+      material: document.getElementById('add-material').value.trim(),
+      gemstone: document.getElementById('add-gemstone').value.trim(),
+      weight: document.getElementById('add-weight').value,
+      quantity: document.getElementById('add-quantity').value || 0,
+      price: document.getElementById('add-price').value,
+      location: document.getElementById('add-location').value.trim(),
+      notes: document.getElementById('add-notes').value.trim()
+    };
+    try {
+      const saved = await apiPost('addProduct', { product });
+      if (saved.error) throw new Error(saved.error);
+      allProducts.push(saved);
+      populateFilterOptions();
+      document.getElementById('new-qr').innerHTML = '';
+      new QRCode(document.getElementById('new-qr'), { text: saved.ID, width: 160, height: 160 });
+      document.getElementById('new-product-id').textContent = saved.SKU || saved.ID;
+      document.getElementById('new-product-result').style.display = 'block';
+      showToast('Item saved');
+    } catch (err) {
+      showToast('Could not save: ' + err.message);
+    }
+  }
+
+  function resetAddForm() {
+    ['add-name','add-sku','add-category','add-material','add-gemstone','add-weight','add-price','add-location','add-notes']
+      .forEach(id => document.getElementById(id).value = '');
+    document.getElementById('add-quantity').value = 1;
+    document.getElementById('new-product-result').style.display = 'none';
+  }
+
+  // ---------- SCAN ----------
+  function startScanner() {
+    if (html5QrCode) return;
+    const hint = document.getElementById('scan-hint');
+    if (!window.isSecureContext) {
+      hint.textContent = 'Camera requires HTTPS. Make sure you opened this page via your https:// link, not a local file.';
+      return;
+    }
+    html5QrCode = new Html5Qrcode('reader');
+    html5QrCode.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: 220 },
+      onScanSuccess
+    ).catch(err => {
+      hint.textContent = 'Camera unavailable: ' + err + '. Check that you allowed camera access for this site in your browser settings.';
+    });
+  }
+
+  function stopScanner() {
+    if (html5QrCode) {
+      html5QrCode.stop().then(() => { html5QrCode = null; }).catch(() => { html5QrCode = null; });
+    }
+  }
+
+  function onScanSuccess(decodedText) {
+    if (scanCooldown) return;
+    scanCooldown = true;
+    setTimeout(() => scanCooldown = false, 1500);
+    const p = allProducts.find(x => x.ID === decodedText);
+    if (p) {
+      openModal(p.ID);
+    } else {
+      showToast('No product found for this code');
+    }
+  }
+
+  // ---------- UTIL ----------
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 1800);
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('setup-url').addEventListener('keydown', e => { if (e.key === 'Enter') saveApiUrl(); });
+
+  boot();
+</script>
+</body>
+</html>
