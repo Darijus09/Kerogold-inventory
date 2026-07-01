@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>KeroGold</title>
+<title>Juvelyrikos inventorius</title>
 <style>
   :root {
     --ink: #1c1b19;
@@ -151,9 +151,14 @@
   .qty-control { display: flex; align-items: center; gap: 12px; justify-content: center; margin: 14px 0; }
   .qty-control button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--ink); background: #fff; font-size: 20px; cursor: pointer; }
   .qty-control .qty-number { font-size: 28px; font-weight: 700; min-width: 50px; text-align: center; }
-  .qty-set-row { display: flex; gap: 8px; margin-bottom: 14px; }
-  .qty-set-row input { margin: 0; }
-  .qty-set-row button { width: auto; padding: 10px 14px; white-space: nowrap; }
+  .reason-btn {
+    padding: 9px 6px; border: none; cursor: pointer;
+    font-size: 13px; border-radius: 3px; font-family: inherit;
+  }
+  .reason-add { background: #eef3ee; color: var(--green); }
+  .reason-add:hover { background: var(--green); color: #fff; }
+  .reason-sub { background: #f7e9e9; color: var(--red); }
+  .reason-sub:hover { background: var(--red); color: #fff; }
   .detail-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f0ece4; }
   .detail-row span:first-child { color: var(--muted); }
   #qr-display { text-align: center; margin: 14px auto; display: flex; justify-content: center; }
@@ -184,100 +189,100 @@
 <!-- LOGIN -->
 <div id="login-screen" class="screen active">
   <div class="login-card">
-    <h1>Inventory</h1>
-    <p class="sub">Sign in to manage stock</p>
-    <input id="login-user" placeholder="Username" autocomplete="username">
-    <input id="login-pass" type="password" placeholder="Password" autocomplete="current-password">
+    <h1>Inventorius</h1>
+    <p class="sub">Prisijunkite</p>
+    <input id="login-user" placeholder="Vartotojo vardas" autocomplete="username">
+    <input id="login-pass" type="password" placeholder="Slaptažodis" autocomplete="current-password">
     <div class="error-text" id="login-error"></div>
-    <button class="primary" onclick="doLogin()">Sign in</button>
+    <button class="primary" onclick="doLogin()">Prisijungti</button>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app-screen" class="screen">
   <header class="topbar">
-    <h1>KeroGold</h1>
+    <h1>Juvelyrikos inventorius</h1>
     <span class="user-chip" id="user-chip" onclick="doLogout()">Atsijungti</span>
   </header>
   <nav class="tabs">
     <button class="tab-btn active" data-tab="inventory" onclick="switchTab('inventory')">Inventorius</button>
-    <button class="tab-btn" data-tab="scan" onclick="switchTab('scan')">QR skanavimas</button>
+    <button class="tab-btn" data-tab="scan" onclick="switchTab('scan')">Skaityti QR</button>
     <button class="tab-btn" data-tab="add" onclick="switchTab('add')">Pridėti prekę</button>
   </nav>
 
   <main>
     <div id="inventory" class="screen active">
       <div class="filters">
-        <input id="f-search" placeholder="Search name / SKU" oninput="onFilterChange()">
-        <select id="f-category" onchange="onFilterChange()"><option value="">All categories</option></select>
-        <select id="f-location" onchange="onFilterChange()"><option value="">All locations</option></select>
+        <input id="f-search" placeholder="Ieškoti pagal pavadinimą / SKU" oninput="onFilterChange()">
+        <select id="f-category" onchange="onFilterChange()"><option value="">Visos kategorijos</option></select>
+        <select id="f-location" onchange="onFilterChange()"><option value="">Visos vietos</option></select>
         <select id="f-stock" onchange="onFilterChange()">
-          <option value="">All stock</option>
-          <option value="instock">In stock</option>
-          <option value="low">Low (≤2)</option>
-          <option value="out">Out of stock</option>
+          <option value="">Visi kiekiai</option>
+          <option value="instock">Sandėlyje</option>
+          <option value="low">Mažai (≤2)</option>
+          <option value="out">Nėra sandėlyje</option>
         </select>
         <select id="f-pagesize" onchange="onFilterChange()" style="min-width:90px;">
-          <option value="25">Show 25</option>
-          <option value="50" selected>Show 50</option>
-          <option value="100">Show 100</option>
-          <option value="200">Show 200</option>
+          <option value="25">Rodyti 25</option>
+          <option value="50" selected>Rodyti 50</option>
+          <option value="100">Rodyti 100</option>
+          <option value="200">Rodyti 200</option>
         </select>
       </div>
       <div class="summary-bar">
         <label class="select-all-label">
           <input type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)">
-          Select all
+          Žymėti visus
         </label>
         <span id="summary-count">—</span>
       </div>
-      <div id="product-list"><div class="spinner-wrap">Loading inventory…</div></div>
+      <div id="product-list"><div class="spinner-wrap">Kraunamas inventorius…</div></div>
       <div id="pagination" style="display:flex;justify-content:center;align-items:center;gap:12px;padding:14px 0;"></div>
     </div>
 
     <div id="scan" class="screen">
       <div id="reader"></div>
-      <p class="scan-hint" id="scan-hint">Point the camera at a product's QR code.</p>
+      <p class="scan-hint" id="scan-hint">Nukreipkite kamerą į prekės QR kodą.</p>
     </div>
 
     <div id="add" class="screen">
-      <label>Photo</label>
+      <label>Nuotrauka</label>
       <img id="add-photo-preview">
       <div class="photo-input-row">
-        <label class="photo-btn">Take photo
+        <label class="photo-btn">Fotografuoti
           <input type="file" accept="image/*" capture="environment" onchange="handlePhotoSelect(event)">
         </label>
-        <label class="photo-btn">Choose from gallery
+        <label class="photo-btn">Pasirinkti iš galerijos
           <input type="file" accept="image/*" onchange="handlePhotoSelect(event)">
         </label>
       </div>
 
-      <label>Product name</label>
-      <input id="add-name" placeholder="e.g. Round earrings with zircon">
-      <label>SKU (optional — leave blank to auto-generate)</label>
-      <input id="add-sku" placeholder="auto-generated from name, e.g. REWZ-0001">
-      <label>Category</label>
+      <label>Prekės pavadinimas</label>
+      <input id="add-name" placeholder="pvz. Apvalūs auskarai su cirkoniu">
+      <label>SKU (neprivaloma — palikite tuščią automatiniam generavimui)</label>
+      <input id="add-sku" placeholder="automatiškai generuojamas, pvz. REWZ-0001">
+      <label>Kategorija</label>
       <select id="add-category"><option value="">Select category</option></select>
-      <label>Material</label>
+      <label>Medžiaga</label>
       <select id="add-material"><option value="">Select material</option></select>
-      <label>Gemstone</label>
+      <label>Akmuo</label>
       <select id="add-gemstone"><option value="">Select gemstone</option></select>
-      <label>Weight (g)</label>
+      <label>Svoris (g)</label>
       <input id="add-weight" type="number" step="0.01">
-      <label>Starting quantity</label>
+      <label>Pradinis kiekis</label>
       <input id="add-quantity" type="number" value="1">
-      <label>Location / shelf</label>
-      <input id="add-location" placeholder="e.g. Display case 2">
-      <label>Notes</label>
+      <label>Vieta / lentyna</label>
+      <input id="add-location" placeholder="pvz. Vitrina 2">
+      <label>Pastabos</label>
       <textarea id="add-notes" rows="2"></textarea>
-      <button class="primary" onclick="submitAddProduct()">Save & generate QR code</button>
+      <button class="primary" onclick="submitAddProduct()">Išsaugoti ir sugeneruoti QR kodą</button>
 
       <div id="new-product-result" style="display:none; margin-top:24px; text-align:center; border-top:1px solid var(--line); padding-top:20px;">
-        <p style="font-size:13px; color:var(--muted);">Item saved. Print this label and attach it to the product.</p>
+        <p style="font-size:13px; color:var(--muted);">Prekė išsaugota. Atspausdinkite etiketę ir pritvirtinkite prie prekės.</p>
         <div id="new-qr"></div>
         <p id="new-product-id" style="font-weight:600; margin-top:8px;"></p>
-        <button class="secondary" onclick="printLabelFor(lastAddedProduct)">Print label</button>
-        <button class="secondary" style="margin-top:8px;" onclick="resetAddForm()">Add another item</button>
+        <button class="secondary" onclick="printLabelFor(lastAddedProduct)">Spausdinti etiketę</button>
+        <button class="secondary" style="margin-top:8px;" onclick="resetAddForm()">Pridėti kitą prekę</button>
       </div>
     </div>
   </main>
@@ -286,11 +291,11 @@
 <!-- Bulk action bar -->
 <div class="bulk-bar" id="bulk-bar">
   <div class="bulk-count" id="bulk-count">0 selected</div>
-  <span style="font-size:12px; color:#aaa;">Pieces:</span>
+  <span style="font-size:12px; color:#aaa;">Kiekis:</span>
   <input type="number" id="bulk-amount" value="1" min="1" style="width:60px;">
-  <button onclick="applyBulk(1)">+ Add to stock</button>
-  <button onclick="applyBulk(-1)">− Remove from stock</button>
-  <button class="clear" onclick="clearSelection()">✕ Clear</button>
+  <button onclick="applyBulk(1)">+ Pridėti į sandėlį</button>
+  <button onclick="applyBulk(-1)">− Pašalinti iš sandėlio</button>
+  <button class="clear" onclick="clearSelection()">✕ Atšaukti</button>
 </div>
 
 <div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this) closeModal()">
@@ -305,25 +310,30 @@
       <div class="qty-number" id="modal-qty">0</div>
       <button onclick="changeQty(1)">+</button>
     </div>
-    <div class="qty-set-row">
-      <input type="number" id="modal-qty-set" placeholder="Set exact quantity">
-      <button class="secondary" onclick="applySetQty()">Set</button>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;">
-      <input type="number" id="modal-qty-change" placeholder="How many pieces" min="1" style="margin:0;flex:1;">
-      <button onclick="applyModalChange(1)" style="padding:10px 14px;background:var(--green);color:#fff;border:none;cursor:pointer;white-space:nowrap;font-size:13px;">+ Add</button>
-      <button onclick="applyModalChange(-1)" style="padding:10px 14px;background:var(--red);color:#fff;border:none;cursor:pointer;white-space:nowrap;font-size:13px;">− Remove</button>
+    <div style="margin-bottom:10px;">
+      <input type="number" id="modal-qty-change" placeholder="Kiek vienetų" min="1"
+        style="width:100%;padding:10px 11px;border:1px solid var(--line);font-size:14px;margin-bottom:8px;font-family:inherit;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <button class="reason-btn reason-add" onclick="applyReason('Arrived', 1)">📦 Gauta +</button>
+        <button class="reason-btn reason-sub" onclick="applyReason('Sold', -1)">🛍 Parduota −</button>
+        <button class="reason-btn reason-add" onclick="applyReason('Returned', 1)">↩️ Grąžinta +</button>
+        <button class="reason-btn reason-sub" onclick="applyReason('Damaged', -1)">⚠️ Sugadinta −</button>
+        <button class="reason-btn reason-add" onclick="applyReason('Correction', 1)">✏️ Korekcija +</button>
+        <button class="reason-btn reason-sub" onclick="applyReason('Correction', -1)">✏️ Korekcija −</button>
+        <button class="reason-btn reason-add" onclick="applyReason('Other', 1)">· Kita +</button>
+        <button class="reason-btn reason-sub" onclick="applyReason('Other', -1)">· Kita −</button>
+      </div>
     </div>
 
-    <div class="detail-row"><span>Category</span><span id="modal-category"></span></div>
-    <div class="detail-row"><span>Material</span><span id="modal-material"></span></div>
-    <div class="detail-row"><span>Gemstone</span><span id="modal-gemstone"></span></div>
-    <div class="detail-row"><span>Weight</span><span id="modal-weight"></span></div>
-    <div class="detail-row"><span>Location</span><span id="modal-location"></span></div>
-    <div class="detail-row"><span>Last updated</span><span id="modal-updated"></span></div>
+    <div class="detail-row"><span>Kategorija</span><span id="modal-category"></span></div>
+    <div class="detail-row"><span>Medžiaga</span><span id="modal-material"></span></div>
+    <div class="detail-row"><span>Akmuo</span><span id="modal-gemstone"></span></div>
+    <div class="detail-row"><span>Svoris</span><span id="modal-weight"></span></div>
+    <div class="detail-row"><span>Vieta</span><span id="modal-location"></span></div>
+    <div class="detail-row"><span>Paskutinis atnaujinimas</span><span id="modal-updated"></span></div>
 
     <div id="qr-display"></div>
-    <button class="secondary" onclick="printLabelFor(activeModalProduct)">Print QR label</button>
+    <button class="secondary" onclick="printLabelFor(activeModalProduct)">Spausdinti QR etiketę</button>
   </div>
 </div>
 
@@ -350,7 +360,7 @@
   // ---------- BOOT ----------
   function boot() {
     if (currentUser) {
-      document.getElementById('user-chip').textContent = currentUser.username + ' · Sign out';
+      document.getElementById('user-chip').textContent = currentUser.username + ' · Atsijungti';
       show('app-screen');
       loadOptions();
       loadProducts();
@@ -388,25 +398,25 @@
     const u = document.getElementById('login-user').value.trim();
     const p = document.getElementById('login-pass').value;
     if (!u || !p) {
-      document.getElementById('login-error').textContent = 'Enter a username and password.';
+      document.getElementById('login-error').textContent = 'Įveskite vartotojo vardą ir slaptažodį.';
       return;
     }
-    document.getElementById('login-error').textContent = 'Signing in…';
+    document.getElementById('login-error').textContent = 'Jungiamasi…';
     try {
       const res = await apiPost('authenticate', { username: u, password: p });
       if (res.ok) {
         currentUser = res;
         localStorage.setItem('jw_user', JSON.stringify(res));
-        document.getElementById('user-chip').textContent = res.username + ' · Sign out';
+        document.getElementById('user-chip').textContent = res.username + ' · Atsijungti';
         document.getElementById('login-error').textContent = '';
         show('app-screen');
         loadOptions();
         loadProducts();
       } else {
-        document.getElementById('login-error').textContent = 'Incorrect username or password.';
+        document.getElementById('login-error').textContent = 'Neteisingas vartotojo vardas arba slaptažodis.';
       }
     } catch (err) {
-      document.getElementById('login-error').textContent = 'Could not reach the API. Check the URL and your connection.';
+      document.getElementById('login-error').textContent = 'Nepavyko prisijungti prie API. Patikrinkite ryšį.';
     }
   }
 
@@ -435,7 +445,7 @@
       fillSelect('add-material', options.materials, 'Select material');
       fillSelect('add-gemstone', options.gemstones, 'Select gemstone');
     } catch (err) {
-      showToast('Could not load category/material lists: ' + err.message);
+      showToast('Nepavyko įkelti sąrašų: ' + err.message);
     }
   }
   function fillSelect(id, values, placeholder) {
@@ -445,7 +455,7 @@
 
   // ---------- INVENTORY ----------
   async function loadProducts() {
-    document.getElementById('product-list').innerHTML = '<div class="spinner-wrap">Loading inventory…</div>';
+    document.getElementById('product-list').innerHTML = '<div class="spinner-wrap">Kraunamas inventorius…</div>';
     try {
       const products = await apiGet('getProducts');
       if (products.error) throw new Error(products.error);
@@ -461,8 +471,8 @@
   function populateFilterOptions() {
     const cats = [...new Set(allProducts.map(p => p.Category).filter(Boolean))].sort();
     const locs = [...new Set(allProducts.map(p => p.Location).filter(Boolean))].sort();
-    document.getElementById('f-category').innerHTML = '<option value="">All categories</option>' + cats.map(c => `<option>${escapeHtml(c)}</option>`).join('');
-    document.getElementById('f-location').innerHTML = '<option value="">All locations</option>' + locs.map(l => `<option>${escapeHtml(l)}</option>`).join('');
+    document.getElementById('f-category').innerHTML = '<option value="">Visos kategorijos</option>' + cats.map(c => `<option>${escapeHtml(c)}</option>`).join('');
+    document.getElementById('f-location').innerHTML = '<option value="">Visos vietos</option>' + locs.map(l => `<option>${escapeHtml(l)}</option>`).join('');
   }
 
   function getFiltered() {
@@ -497,8 +507,8 @@
 
     const list = document.getElementById('product-list');
     document.getElementById('summary-count').textContent =
-      `${filtered.length} item${filtered.length !== 1 ? 's' : ''}` +
-      (totalPages > 1 ? ` · page ${currentPage}/${totalPages}` : '');
+      `${filtered.length} vnt.` +
+      (totalPages > 1 ? ` · puslapis ${currentPage}/${totalPages}` : '');
 
     if (!filtered.length) {
       list.innerHTML = '<div class="empty-state">No items match these filters.</div>';
@@ -533,7 +543,7 @@
     if (totalPages <= 1) { pag.innerHTML = ''; return; }
     const btnStyle = 'padding:7px 14px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:13px;';
     const activeBtnStyle = 'padding:7px 14px;border:1px solid var(--gold);background:var(--gold);color:#fff;cursor:default;font-size:13px;';
-    let html = `<button style="${btnStyle}" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Prev</button>`;
+    let html = `<button style="${btnStyle}" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Atgal</button>`;
     for (let i = 1; i <= totalPages; i++) {
       if (totalPages > 7 && Math.abs(i - currentPage) > 2 && i !== 1 && i !== totalPages) {
         if (i === 2 || i === totalPages - 1) html += `<span style="padding:0 4px;">…</span>`;
@@ -541,7 +551,7 @@
       }
       html += `<button style="${i === currentPage ? activeBtnStyle : btnStyle}" onclick="goPage(${i})">${i}</button>`;
     }
-    html += `<button style="${btnStyle}" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Next ›</button>`;
+    html += `<button style="${btnStyle}" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Pirmyn ›</button>`;
     pag.innerHTML = html;
   }
 
@@ -629,17 +639,17 @@
       return { id, newQty };
     });
 
-    showToast('Updating…');
+    showToast('Atnaujinama…');
     try {
       // Run all setQuantity calls in parallel
       await Promise.all(updates.map(u =>
-        apiPost('setQuantity', { id: u.id, quantity: u.newQty, username: currentUser ? currentUser.username : '' })
+        apiPost('setQuantity', { id: u.id, quantity: u.newQty, username: currentUser ? currentUser.username : '', reason: sign > 0 ? 'Masinis pridėjimas' : 'Masinis pašalinimas' })
       ));
-      showToast(`${sign > 0 ? 'Added' : 'Removed'} ${amount} on ${ids.length} item${ids.length !== 1 ? 's' : ''}`);
+      showToast(`${sign > 0 ? 'Pridėta' : 'Pašalinta'} ${amount} on ${ids.length} vnt.`);
       clearSelection();
       await loadProducts();
     } catch (err) {
-      showToast('Bulk update failed: ' + err.message);
+      showToast('Masinis atnaujinimas nepavyko: ' + err.message);
     }
   }
 
@@ -698,50 +708,28 @@
     const newQty = Math.max(0, Number(qtyEl.textContent) + delta);
     qtyEl.textContent = newQty;
     try {
-      const res = await apiPost('setQuantity', { id: activeModalId, quantity: newQty, username: currentUser ? currentUser.username : '' });
-      if (res.ok) {
-        const p = allProducts.find(x => x.ID === activeModalId);
-        if (p) p.Quantity = res.newQuantity;
-        renderProducts();
-        showToast(delta > 0 ? 'Added 1' : 'Removed 1');
-      }
-    } catch (err) { showToast('Network error — change not saved'); }
+      const res = await apiPost('setQuantity', { id: activeModalId, quantity: newQty, username: currentUser ? currentUser.username : '', reason: delta > 0 ? 'Rankinis +1' : 'Rankinis −1' });
+      if (res.ok) { const p = allProducts.find(x => x.ID === activeModalId); if (p) p.Quantity = res.newQuantity; renderProducts(); }
+    } catch (err) { showToast('Tinklo klaida — pakeitimas neišsaugotas'); }
   }
 
-  async function applySetQty() {
-    if (!activeModalId) return;
-    const val = document.getElementById('modal-qty-set').value;
-    if (val === '') return;
-    const newQty = Math.max(0, Number(val));
-    try {
-      const res = await apiPost('setQuantity', { id: activeModalId, quantity: newQty, username: currentUser ? currentUser.username : '' });
-      if (res.ok) {
-        document.getElementById('modal-qty').textContent = res.newQuantity;
-        const p = allProducts.find(x => x.ID === activeModalId);
-        if (p) p.Quantity = res.newQuantity;
-        renderProducts();
-        showToast('Quantity set to ' + res.newQuantity);
-      }
-    } catch (err) { showToast('Network error — change not saved'); }
-  }
-
-  async function applyModalChange(sign) {
+  async function applyReason(reason, sign) {
     if (!activeModalId) return;
     const amount = Math.abs(Number(document.getElementById('modal-qty-change').value));
-    if (!amount || amount < 1) { showToast('Enter how many pieces'); return; }
+    if (!amount || amount < 1) { showToast('Pirmiau įveskite kiekį'); return; }
     const qtyEl = document.getElementById('modal-qty');
     const newQty = Math.max(0, Number(qtyEl.textContent) + (sign * amount));
     qtyEl.textContent = newQty;
     document.getElementById('modal-qty-change').value = '';
     try {
-      const res = await apiPost('setQuantity', { id: activeModalId, quantity: newQty, username: currentUser ? currentUser.username : '' });
+      const res = await apiPost('setQuantity', { id: activeModalId, quantity: newQty, username: currentUser ? currentUser.username : '', reason });
       if (res.ok) {
         const p = allProducts.find(x => x.ID === activeModalId);
         if (p) p.Quantity = res.newQuantity;
         renderProducts();
-        showToast(sign > 0 ? `Added ${amount}` : `Removed ${amount}`);
+        showToast(`${reason}: ${sign > 0 ? '+' : '−'}${amount}`);
       }
-    } catch (err) { showToast('Network error — change not saved'); }
+    } catch (err) { showToast('Tinklo klaida — pakeitimas neišsaugotas'); }
   }
 
   // ---------- PHOTO CAPTURE (Add form) ----------
@@ -773,7 +761,7 @@
   // ---------- ADD PRODUCT ----------
   async function submitAddProduct() {
     const name = document.getElementById('add-name').value.trim();
-    if (!name) { showToast('Enter a product name'); return; }
+    if (!name) { showToast('Įveskite prekės pavadinimą'); return; }
     const product = {
       name: name,
       sku: document.getElementById('add-sku').value.trim(),
@@ -795,9 +783,9 @@
       new QRCode(document.getElementById('new-qr'), { text: saved.ID, width: 160, height: 160 });
       document.getElementById('new-product-id').textContent = saved.SKU || saved.ID;
       document.getElementById('new-product-result').style.display = 'block';
-      showToast('Item saved as ' + (saved.SKU || saved.ID));
+      showToast('Prekė išsaugota: ' + (saved.SKU || saved.ID));
     } catch (err) {
-      showToast('Could not save: ' + err.message);
+      showToast('Nepavyko išsaugoti: ' + err.message);
     }
   }
 
@@ -830,7 +818,7 @@
       const loc  = (product.Location || '').replace(/</g,'&lt;');
 
       const win = window.open('', '_blank', 'width=300,height=380,toolbar=0,menubar=0,scrollbars=0,resizable=0');
-      if (!win) { showToast('Allow popups for this site to print labels'); return; }
+      if (!win) { showToast('Leiskite iššokančius langus šioje svetainėje, kad galėtumėte spausdinti'); return; }
 
       win.document.write(`<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><style>
@@ -872,7 +860,7 @@
   <div class="sku">${sku}</div>
   ${loc ? `<div class="loc">${loc}</div>` : ''}
 </div>
-<button class="print-btn" onclick="window.print()">🖨 Print label</button>
+<button class="print-btn" onclick="window.print()">🖨 Spausdinti etiketę</button>
 </body></html>`);
       win.document.close();
     }, 250);
@@ -892,7 +880,7 @@
       { fps: 10, qrbox: 220 },
       onScanSuccess
     ).catch(err => {
-      hint.textContent = 'Camera unavailable: ' + err + '. Check that you allowed camera access for this site in your browser settings.';
+      hint.textContent = 'Kamera nepasiekiama: ' + err + '. Patikrinkite, ar suteikėte leidimą naudoti kamerą naršyklės nustatymuose.';
     });
   }
 
@@ -910,7 +898,7 @@
     if (p) {
       switchToTabAndOpen('inventory', p.ID);
     } else {
-      showToast('No product found for this code');
+      showToast('Prekė su šiuo kodu nerasta');
     }
   }
   function switchToTabAndOpen(tab, id) {
