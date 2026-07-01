@@ -705,19 +705,28 @@ function applyThumb(el, dataUrl) {
 }
 
 // ── QUICK SELL ────────────────────────────────────────────────────────────────
+const quickSellPending = new Set();
+
 async function quickSell(event, id) {
   event.stopPropagation();
+  if (quickSellPending.has(id)) return; // already in flight, ignore
+  quickSellPending.add(id);
   const p = allProducts.find(x=>x.ID===id);
-  if (!p) return;
+  if (!p) { quickSellPending.delete(id); return; }
   const newQty = Math.max(0, Number(p.Quantity||0)-1);
   p.Quantity = newQty;
   renderProducts();
   try {
     await apiPost('setQuantity',{id, quantity:newQty, username:currentUser?.username||'', reason:'Sold'});
     showToast(`${p.Name}: −1 Parduota`);
-    // Update cache
     localStorage.setItem('jw_products', JSON.stringify(allProducts));
-  } catch(e) { showToast('Klaida — pakeitimas neišsaugotas'); }
+  } catch(e) {
+    showToast('Klaida — pakeitimas neišsaugotas');
+    p.Quantity = newQty + 1; // revert
+    renderProducts();
+  } finally {
+    quickSellPending.delete(id); // allow next tap only after API call completes
+  }
 }
 
 // ── SELECTION / BULK ──────────────────────────────────────────────────────────
