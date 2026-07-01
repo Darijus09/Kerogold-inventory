@@ -655,8 +655,9 @@
 
   // ---------- MODAL ----------
   function openModal(id) {
+    try {
     const p = allProducts.find(x => x.ID === id);
-    if (!p) return;
+    if (!p) { showToast('Prekė nerasta: ' + id); return; }
     activeModalId = id;
     activeModalProduct = p;
     document.getElementById('modal-name').textContent = p.Name || '(unnamed)';
@@ -676,13 +677,11 @@
       photoEl.src = p.PhotoData;
       photoEl.style.display = 'block';
     } else {
-      // Fetch photo lazily if not yet loaded
       apiGet('getPhoto', { id }).then(res => {
         if (res.photo) {
           p.PhotoData = res.photo;
           photoEl.src = res.photo;
           photoEl.style.display = 'block';
-          // Also update the thumb in the list if visible
           const thumb = document.querySelector(`.lazy-thumb[data-id="${id}"]`);
           if (thumb) applyThumb(thumb, res.photo);
         }
@@ -694,6 +693,7 @@
     new QRCode(qrDiv, { text: p.ID, width: 140, height: 140 });
 
     document.getElementById('modal-backdrop').classList.add('active');
+    } catch(err) { showToast('Klaida: ' + err.message); }
   }
 
   function closeModal() {
