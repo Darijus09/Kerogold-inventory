@@ -187,6 +187,7 @@ button.secondary{width:100%;padding:10px;background:none;border:1px solid var(--
           <span id="summary-count">—</span>
         </div>
         <div class="toolbar-right">
+          <button class="export-btn" id="archive-toggle-btn" onclick="toggleShowArchived()">📦 Rodyti archyvą</button>
           <button class="export-btn" onclick="exportCSV()">⬇ CSV</button>
           <button class="export-btn" onclick="loadProducts(true)">↻ Atnaujinti</button>
         </div>
@@ -360,6 +361,8 @@ let pendingPhotoDataUrl = '';
 let editPhotoDataUrl    = '';
 let currentPage   = 1;
 let photoObserver = null;
+let showArchived  = false;
+let archivedProducts = [];
 
 // ── BOOT ─────────────────────────────────────────────────────────────────────
 function boot() {
@@ -538,7 +541,42 @@ function populateFilterOptions() {
 
 function onFilterChange() { currentPage=1; renderProducts(); }
 
+function toggleShowArchived() {
+  showArchived = !showArchived;
+  const btn = document.getElementById('archive-toggle-btn');
+  btn.textContent = showArchived ? '✕ Slėpti archyvą' : '📦 Rodyti archyvą';
+  btn.style.color = showArchived ? 'var(--gold)' : '';
+  btn.style.borderColor = showArchived ? 'var(--gold)' : '';
+  if (showArchived && !archivedProducts.length) loadArchived();
+  else { currentPage=1; renderProducts(); }
+}
+
+async function loadArchived() {
+  showToast('Kraunamas archyvas…');
+  try {
+    const res = await apiGet('getArchivedProducts');
+    if (res.error) throw new Error(res.error);
+    archivedProducts = res;
+    currentPage=1; renderProducts();
+  } catch(e) { showToast('Klaida: '+e.message); }
+}
+
+async function restoreProduct(id) {
+  try {
+    const res = await apiPost('restoreProduct', {id, username: currentUser?.username||''});
+    if (res.ok) {
+      const p = archivedProducts.find(x=>x.ID===id);
+      if (p) { p.Archived=false; allProducts.push(p); }
+      archivedProducts = archivedProducts.filter(x=>x.ID!==id);
+      localStorage.setItem('jw_products', JSON.stringify(allProducts));
+      renderProducts();
+      showToast('Prekė atkurta iš archyvo');
+    } else showToast('Klaida: '+(res.error||''));
+  } catch(e) { showToast('Klaida: '+e.message); }
+}
+
 function getFiltered() {
+  if (showArchived) return archivedProducts; // show all archived, no filtering
   const search = document.getElementById('f-search').value.toLowerCase();
   const cat    = document.getElementById('f-category').value;
   const loc    = document.getElementById('f-location').value;
@@ -580,6 +618,21 @@ function renderProducts() {
     const lowClass = isLow ? 'low' : '';
     const cardLow  = isLow ? 'low-stock' : '';
     const checked  = selectedIds.has(p.ID) ? 'checked' : '';
+
+    if (showArchived) {
+      return `<div class="product-card" style="opacity:.75;">
+        <div class="card-thumb lazy-thumb" data-id="${p.ID}"></div>
+        <div class="card-body" style="flex:1;">
+          <div class="pname">${escapeHtml(p.Name||'(unnamed)')}</div>
+          <div class="pmeta">${escapeHtml(p.SKU||p.ID)} · ${escapeHtml(p.Category||'—')}</div>
+        </div>
+        <div class="card-right">
+          <div class="qty-badge" style="background:#f0ece4;color:var(--muted);">${qty}</div>
+          <button class="quick-sell" style="background:var(--green);" onclick="restoreProduct('${p.ID}')">↩ Atkurti</button>
+        </div>
+      </div>`;
+    }
+
     return `<div class="product-card ${cardLow}" onclick="openModal('${p.ID}')">
       <input type="checkbox" class="card-checkbox" ${checked}
         onclick="event.stopPropagation()"
