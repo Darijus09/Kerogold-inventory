@@ -772,6 +772,9 @@ function openModal(id) {
 
 function closeModal() {
   document.getElementById('modal-backdrop').classList.remove('active');
+  document.getElementById('edit-section').classList.remove('open');
+  const btn=document.querySelector('[onclick="toggleEdit()"]');
+  if(btn) btn.textContent='✏️ Redaguoti';
   activeModalId=null; activeModalProduct=null;
 }
 
@@ -816,26 +819,34 @@ async function applyReason(reason, sign) {
 
 // ── EDIT PRODUCT ──────────────────────────────────────────────────────────────
 function toggleEdit() {
-  const sec=document.getElementById('edit-section');
-  const isOpen=sec.classList.contains('open');
-  if (!isOpen && activeModalProduct) {
-    const p=activeModalProduct;
-    document.getElementById('edit-name').value=p.Name||'';
-    document.getElementById('edit-sku').value=p.SKU||'';
-    document.getElementById('edit-location').value=p.Location||'';
-    document.getElementById('edit-weight').value=p.WeightGrams||'';
-    document.getElementById('edit-notes').value=p.Notes||'';
-    // Set selects
-    ['edit-category','edit-material','edit-gemstone'].forEach(selId=>{
-      const sel=document.getElementById(selId);
-      const field=selId.replace('edit-','');
-      const fieldMap={category:'Category',material:'Material',gemstone:'Gemstone'};
-      const val=p[fieldMap[field]]||'';
-      const opt=[...sel.options].find(o=>o.value===val||o.text===val);
-      if(opt) sel.value=opt.value; else sel.value='';
-    });
-  }
-  sec.classList.toggle('open');
+  try {
+    const sec=document.getElementById('edit-section');
+    const isOpen=sec.classList.contains('open');
+    if (!isOpen && activeModalProduct) {
+      const p=activeModalProduct;
+      document.getElementById('edit-name').value=p.Name||'';
+      document.getElementById('edit-sku').value=p.SKU||'';
+      document.getElementById('edit-location').value=p.Location||'';
+      document.getElementById('edit-weight').value=p.WeightGrams||'';
+      document.getElementById('edit-notes').value=p.Notes||'';
+      ['edit-category','edit-material','edit-gemstone'].forEach(selId=>{
+        const sel=document.getElementById(selId);
+        const field=selId.replace('edit-','');
+        const fieldMap={category:'Category',material:'Material',gemstone:'Gemstone'};
+        const val=p[fieldMap[field]]||'';
+        const opt=[...sel.options].find(o=>o.value===val||o.text===val);
+        if(opt) sel.value=opt.value; else sel.value='';
+      });
+      sec.classList.add('open');
+      // Scroll edit section into view inside the modal
+      setTimeout(()=>sec.scrollIntoView({behavior:'smooth',block:'start'}),50);
+    } else {
+      sec.classList.remove('open');
+    }
+    // Update button label
+    const btn = document.querySelector('[onclick="toggleEdit()"]');
+    if (btn) btn.textContent = sec.classList.contains('open') ? '✕ Uždaryti redagavimą' : '✏️ Redaguoti';
+  } catch(err) { showToast('Klaida: '+err.message); }
 }
 
 function handleEditPhoto(event) {
@@ -1064,6 +1075,23 @@ function escapeHtml(str) {
 }
 
 document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ── TAB SWIPE ─────────────────────────────────────────────────────────────────
+const TABS = ['inventory','scan','add'];
+let swipeStartX=0, swipeStartY=0;
+document.querySelector('main').addEventListener('touchstart', e=>{
+  swipeStartX=e.touches[0].clientX;
+  swipeStartY=e.touches[0].clientY;
+},{passive:true});
+document.querySelector('main').addEventListener('touchend', e=>{
+  const dx=e.changedTouches[0].clientX - swipeStartX;
+  const dy=Math.abs(e.changedTouches[0].clientY - swipeStartY);
+  if (Math.abs(dx)<80||dy>50) return; // not a horizontal swipe
+  const activeTab=document.querySelector('.tab-btn.active')?.dataset?.tab;
+  const idx=TABS.indexOf(activeTab);
+  if (dx<0 && idx<TABS.length-1) switchTab(TABS[idx+1]); // swipe left → next tab
+  if (dx>0 && idx>0)             switchTab(TABS[idx-1]); // swipe right → prev tab
+},{passive:true});
 
 boot();
 </script>
