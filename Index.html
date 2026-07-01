@@ -5,183 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Juvelyrikos inventorius</title>
 <style>
-  :root {
-    --ink: #1c1b19;
-    --paper: #faf7f2;
-    --gold: #a8823c;
-    --gold-deep: #8a6a2e;
-    --line: #e3ddd1;
-    --green: #2f4a3c;
-    --red: #9c3b3b;
-    --muted: #74695c;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--paper);
-    color: var(--ink);
-  }
-  header.topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 18px;
-    background: var(--ink);
-    color: var(--paper);
-  }
-  header.topbar h1 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 19px;
-    letter-spacing: 0.5px;
-    margin: 0;
-    font-weight: 600;
-  }
-  header.topbar .user-chip { font-size: 12px; color: var(--gold); cursor: pointer; }
-  nav.tabs {
-    display: flex;
-    background: #fff;
-    border-bottom: 1px solid var(--line);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  nav.tabs button {
-    flex: 1;
-    padding: 12px 6px;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    font-size: 13px;
-    color: var(--muted);
-    cursor: pointer;
-  }
-  nav.tabs button.active { color: var(--ink); border-bottom: 2px solid var(--gold); font-weight: 600; }
-  main { padding: 16px; max-width: 760px; margin: 0 auto; padding-bottom: 90px; }
-  .screen { display: none; }
-  .screen.active { display: block; }
+:root {
+  --ink:#1c1b19; --paper:#faf7f2; --gold:#a8823c; --gold-deep:#8a6a2e;
+  --line:#e3ddd1; --green:#2f4a3c; --red:#9c3b3b; --muted:#74695c;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--paper);color:var(--ink);}
+header.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--ink);color:var(--paper);}
+header.topbar h1{font-family:Georgia,serif;font-size:19px;letter-spacing:.5px;margin:0;font-weight:600;}
+.topbar-right{display:flex;align-items:center;gap:14px;}
+.topbar-right .icon-btn{background:none;border:none;color:var(--gold);font-size:18px;cursor:pointer;padding:0;}
+.user-chip{font-size:12px;color:var(--gold);cursor:pointer;}
+nav.tabs{display:flex;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;}
+nav.tabs button{flex:1;padding:12px 6px;background:none;border:none;border-bottom:2px solid transparent;font-size:13px;color:var(--muted);cursor:pointer;}
+nav.tabs button.active{color:var(--ink);border-bottom:2px solid var(--gold);font-weight:600;}
+main{padding:16px;max-width:760px;margin:0 auto;padding-bottom:100px;}
+.screen{display:none;}.screen.active{display:block;}
 
-  #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-  .login-card { background: #fff; border: 1px solid var(--line); padding: 32px 28px; width: 100%; max-width: 320px; text-align: center; }
-  .login-card h1 { font-family: Georgia, serif; margin: 0 0 4px; font-size: 22px; }
-  .login-card p.sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+/* Login */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;}
+.login-card{background:#fff;border:1px solid var(--line);padding:32px 28px;width:100%;max-width:320px;text-align:center;}
+.login-card h1{font-family:Georgia,serif;margin:0 0 4px;font-size:22px;}
+.login-card p.sub{color:var(--muted);font-size:13px;margin:0 0 20px;}
 
-  input, select, textarea {
-    width: 100%;
-    padding: 10px 11px;
-    border: 1px solid var(--line);
-    background: #fff;
-    font-size: 14px;
-    margin-bottom: 10px;
-    border-radius: 2px;
-    font-family: inherit;
-  }
-  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--gold); }
-  label { font-size: 12px; color: var(--muted); display: block; margin-bottom: 4px; }
-  button.primary {
-    width: 100%; padding: 11px; background: var(--ink); color: var(--paper);
-    border: none; font-size: 14px; cursor: pointer; letter-spacing: 0.3px;
-  }
-  button.primary:hover { background: var(--gold-deep); }
-  button.secondary {
-    width: 100%; padding: 10px; background: none; border: 1px solid var(--ink);
-    color: var(--ink); font-size: 13px; cursor: pointer;
-  }
-  .error-text { color: var(--red); font-size: 12px; margin: -4px 0 10px; }
+input,select,textarea{width:100%;padding:10px 11px;border:1px solid var(--line);background:#fff;font-size:14px;margin-bottom:10px;border-radius:2px;font-family:inherit;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);}
+label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px;}
+button.primary{width:100%;padding:11px;background:var(--ink);color:var(--paper);border:none;font-size:14px;cursor:pointer;}
+button.primary:hover{background:var(--gold-deep);}
+button.secondary{width:100%;padding:10px;background:none;border:1px solid var(--ink);color:var(--ink);font-size:13px;cursor:pointer;}
+.error-text{color:var(--red);font-size:12px;margin:-4px 0 10px;}
 
-  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-  .filters input, .filters select { margin-bottom: 0; flex: 1; min-width: 110px; }
+/* Filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.filters input,.filters select{margin-bottom:0;flex:1;min-width:110px;}
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid var(--line);padding-bottom:8px;gap:8px;flex-wrap:wrap;}
+.toolbar-left{display:flex;align-items:center;gap:8px;}
+.toolbar-right{display:flex;align-items:center;gap:8px;}
+.select-all-label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:var(--muted);}
+#summary-count{font-size:12px;color:var(--muted);}
+.export-btn{padding:6px 10px;font-size:12px;background:none;border:1px solid var(--line);cursor:pointer;color:var(--muted);}
+.export-btn:hover{border-color:var(--gold);color:var(--gold);}
 
-  .summary-bar {
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 12px; color: var(--muted); margin-bottom: 10px;
-    border-bottom: 1px solid var(--line); padding-bottom: 8px;
-  }
-  .summary-bar .select-all-label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+/* Cards */
+.product-card{background:#fff;border:1px solid var(--line);padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;cursor:pointer;position:relative;transition:border-color .15s;}
+.product-card:hover{border-color:var(--gold);}
+.product-card.low-stock{border-left:3px solid var(--red);}
+.card-checkbox{flex:0 0 auto;width:18px;height:18px;margin:0;cursor:pointer;}
+.card-thumb{width:44px;height:44px;border-radius:4px;object-fit:cover;background:#f0ece4;flex:0 0 auto;}
+.card-body{flex:1;min-width:0;}
+.pname{font-weight:600;font-size:14px;}
+.pmeta{font-size:12px;color:var(--muted);margin-top:2px;}
+.card-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.qty-badge{font-size:13px;font-weight:700;padding:4px 10px;border-radius:12px;background:#eef3ee;color:var(--green);white-space:nowrap;}
+.qty-badge.low{background:#f7e9e9;color:var(--red);}
+.quick-sell{padding:4px 8px;font-size:11px;background:var(--red);color:#fff;border:none;border-radius:10px;cursor:pointer;white-space:nowrap;}
+.quick-sell:active{opacity:.7;}
 
-  .product-card {
-    background: #fff; border: 1px solid var(--line); padding: 10px 12px;
-    margin-bottom: 8px; display: flex; align-items: center; gap: 10px;
-  }
-  .product-card:hover { border-color: var(--gold); }
-  .product-card .card-checkbox { flex: 0 0 auto; width: 18px; height: 18px; margin: 0; cursor: pointer; }
-  .product-card .card-thumb {
-    width: 44px; height: 44px; border-radius: 4px; object-fit: cover;
-    background: #f0ece4; flex: 0 0 auto; cursor: pointer;
-  }
-  .product-card .card-body { flex: 1; min-width: 0; cursor: pointer; }
-  .product-card .pname { font-weight: 600; font-size: 14px; }
-  .product-card .pmeta { font-size: 12px; color: var(--muted); margin-top: 2px; }
-  .qty-badge {
-    font-size: 13px; font-weight: 700; padding: 4px 10px; border-radius: 12px;
-    background: #eef3ee; color: var(--green); white-space: nowrap; cursor: pointer;
-  }
-  .qty-badge.low { background: #f7e9e9; color: var(--red); }
+/* Bulk bar */
+.bulk-bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:#fff;padding:10px 14px;display:none;align-items:center;gap:10px;z-index:50;flex-wrap:wrap;}
+.bulk-bar.active{display:flex;}
+.bulk-count{font-size:13px;flex:1 1 100%;}
+.bulk-bar input{width:64px;margin:0;padding:8px;}
+.bulk-bar button{padding:8px 12px;border:1px solid var(--gold);background:none;color:#fff;font-size:13px;cursor:pointer;border-radius:3px;}
+.bulk-bar button.clear{border-color:#555;color:#ccc;}
 
-  /* Bulk action bar */
-  .bulk-bar {
-    position: fixed; left: 0; right: 0; bottom: 0;
-    background: var(--ink); color: #fff;
-    padding: 10px 14px; display: none;
-    align-items: center; gap: 10px; z-index: 50;
-    flex-wrap: wrap;
-  }
-  .bulk-bar.active { display: flex; }
-  .bulk-bar .bulk-count { font-size: 13px; flex: 1 1 100%; }
-  .bulk-bar input { width: 64px; margin: 0; padding: 8px; }
-  .bulk-bar button {
-    padding: 8px 12px; border: 1px solid var(--gold); background: none;
-    color: #fff; font-size: 13px; cursor: pointer; border-radius: 3px;
-  }
-  .bulk-bar button.clear { border-color: #555; color: #ccc; }
+/* Modal */
+.modal-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:flex-end;justify-content:center;}
+.modal-backdrop.active{display:flex;}
+.modal{background:#fff;width:100%;max-width:480px;padding:22px;border-radius:10px 10px 0 0;max-height:88vh;overflow-y:auto;}
+.modal h2{font-family:Georgia,serif;margin:0 0 2px;font-size:20px;}
+.modal-sub{color:var(--muted);font-size:13px;margin-bottom:14px;}
+.modal-close{float:right;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);}
+#modal-photo{width:100%;height:200px;object-fit:contain;object-position:center;background:#f5f2ed;border-radius:6px;margin-bottom:12px;display:none;}
+.qty-control{display:flex;align-items:center;gap:12px;justify-content:center;margin:14px 0;}
+.qty-control button{width:44px;height:44px;border-radius:50%;border:1px solid var(--ink);background:#fff;font-size:20px;cursor:pointer;}
+.qty-number{font-size:28px;font-weight:700;min-width:50px;text-align:center;}
+.reason-btn{padding:9px 6px;border:none;cursor:pointer;font-size:13px;border-radius:3px;font-family:inherit;}
+.reason-add{background:#eef3ee;color:var(--green);}.reason-add:hover{background:var(--green);color:#fff;}
+.reason-sub{background:#f7e9e9;color:var(--red);}.reason-sub:hover{background:var(--red);color:#fff;}
+.detail-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid #f0ece4;}
+.detail-row span:first-child{color:var(--muted);}
+#qr-display{text-align:center;margin:14px auto;display:flex;justify-content:center;}
 
-  .modal-backdrop {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45);
-    z-index: 100; align-items: flex-end; justify-content: center;
-  }
-  .modal-backdrop.active { display: flex; }
-  .modal {
-    background: #fff; width: 100%; max-width: 480px; padding: 22px;
-    border-radius: 10px 10px 0 0; max-height: 88vh; overflow-y: auto;
-  }
-  .modal h2 { font-family: Georgia, serif; margin: 0 0 2px; font-size: 20px; }
-  .modal .modal-sub { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
-  .modal-close { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); }
-  #modal-photo { width: 100%; height: 200px; object-fit: contain; object-position: center; background: #f5f2ed; border-radius: 6px; margin-bottom: 12px; display: none; }
-  .qty-control { display: flex; align-items: center; gap: 12px; justify-content: center; margin: 14px 0; }
-  .qty-control button { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--ink); background: #fff; font-size: 20px; cursor: pointer; }
-  .qty-control .qty-number { font-size: 28px; font-weight: 700; min-width: 50px; text-align: center; }
-  .reason-btn {
-    padding: 9px 6px; border: none; cursor: pointer;
-    font-size: 13px; border-radius: 3px; font-family: inherit;
-  }
-  .reason-add { background: #eef3ee; color: var(--green); }
-  .reason-add:hover { background: var(--green); color: #fff; }
-  .reason-sub { background: #f7e9e9; color: var(--red); }
-  .reason-sub:hover { background: var(--red); color: #fff; }
-  .detail-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f0ece4; }
-  .detail-row span:first-child { color: var(--muted); }
-  #qr-display { text-align: center; margin: 14px auto; display: flex; justify-content: center; }
+/* Edit mode inside modal */
+.edit-section{display:none;border-top:1px solid var(--line);margin-top:14px;padding-top:14px;}
+.edit-section.open{display:block;}
+.edit-section label{font-size:12px;color:var(--muted);margin-bottom:4px;display:block;}
+.edit-section input,.edit-section select,.edit-section textarea{margin-bottom:8px;}
+.edit-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.edit-actions button{flex:1;padding:10px;font-size:13px;cursor:pointer;border:none;}
+.btn-save-edit{background:var(--ink);color:#fff;}
+.btn-archive{background:#f5e9cc;color:#7a5a10;}
+.btn-delete{background:#f7e9e9;color:var(--red);}
 
-  #reader { width: 100%; max-width: 420px; margin: 0 auto; }
-  .scan-hint { text-align: center; color: var(--muted); font-size: 13px; margin-top: 10px; }
+/* Scan */
+#reader{width:100%;max-width:420px;margin:0 auto;}
+.scan-hint{text-align:center;color:var(--muted);font-size:13px;margin-top:10px;}
 
-  .toast {
-    position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
-    background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 20px;
-    font-size: 13px; opacity: 0; transition: opacity 0.25s; pointer-events: none; z-index: 200;
-  }
-  .toast.show { opacity: 1; }
-  .empty-state { text-align: center; color: var(--muted); padding: 40px 10px; font-size: 14px; }
-  .spinner-wrap { text-align: center; padding: 30px; color: var(--muted); font-size: 13px; }
+/* Add form */
+.photo-input-row{display:flex;gap:8px;margin-bottom:10px;}
+.photo-input-row label.photo-btn{flex:1;text-align:center;padding:10px;border:1px dashed var(--line);cursor:pointer;font-size:13px;color:var(--muted);margin:0;}
+.photo-input-row input[type=file]{display:none;}
+#add-photo-preview{width:100%;max-height:200px;object-fit:contain;background:#f5f2ed;border-radius:6px;margin-bottom:10px;display:none;}
+.required-star{color:var(--red);}
 
-  .photo-input-row { display: flex; gap: 8px; margin-bottom: 10px; }
-  .photo-input-row label.photo-btn {
-    flex: 1; text-align: center; padding: 10px; border: 1px dashed var(--line);
-    cursor: pointer; font-size: 13px; color: var(--muted); margin: 0;
-  }
-  .photo-input-row input[type=file] { display: none; }
-  #add-photo-preview { width: 100%; max-height: 200px; object-fit: contain; background: #f5f2ed; border-radius: 6px; margin-bottom: 10px; display: none; }
+/* Settings modal */
+#settings-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end;justify-content:center;}
+#settings-modal.open{display:flex;}
+.settings-panel{background:#fff;width:100%;max-width:480px;padding:22px;border-radius:10px 10px 0 0;max-height:70vh;overflow-y:auto;}
+.settings-panel h3{margin:0 0 14px;font-family:Georgia,serif;}
+
+/* Pagination */
+#pagination{display:flex;justify-content:center;align-items:center;gap:6px;padding:14px 0;flex-wrap:wrap;}
+.pg-btn{padding:7px 12px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:13px;}
+.pg-btn.active{border-color:var(--gold);background:var(--gold);color:#fff;cursor:default;}
+
+/* Toast */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:300;}
+.toast.show{opacity:1;}
+.empty-state{text-align:center;color:var(--muted);padding:40px 10px;font-size:14px;}
+.spinner-wrap{text-align:center;padding:30px;color:var(--muted);font-size:13px;}
+.stale-badge{font-size:10px;color:var(--muted);margin-left:6px;}
 </style>
 </head>
 <body>
@@ -189,7 +134,7 @@
 <!-- LOGIN -->
 <div id="login-screen" class="screen active">
   <div class="login-card">
-    <h1>Inventorius</h1>
+    <h1>Juvelyrikos inventorius</h1>
     <p class="sub">Prisijunkite</p>
     <input id="login-user" placeholder="Vartotojo vardas" autocomplete="username">
     <input id="login-pass" type="password" placeholder="Slaptažodis" autocomplete="current-password">
@@ -202,7 +147,10 @@
 <div id="app-screen" class="screen">
   <header class="topbar">
     <h1>Juvelyrikos inventorius</h1>
-    <span class="user-chip" id="user-chip" onclick="doLogout()">Atsijungti</span>
+    <div class="topbar-right">
+      <button class="icon-btn" onclick="openSettings()" title="Nustatymai">⚙️</button>
+      <span class="user-chip" id="user-chip" onclick="doLogout()">Atsijungti</span>
+    </div>
   </header>
   <nav class="tabs">
     <button class="tab-btn active" data-tab="inventory" onclick="switchTab('inventory')">Inventorius</button>
@@ -211,6 +159,7 @@
   </nav>
 
   <main>
+    <!-- INVENTORY -->
     <div id="inventory" class="screen active">
       <div class="filters">
         <input id="f-search" placeholder="Ieškoti pagal pavadinimą / SKU" oninput="onFilterChange()">
@@ -219,7 +168,7 @@
         <select id="f-stock" onchange="onFilterChange()">
           <option value="">Visi kiekiai</option>
           <option value="instock">Sandėlyje</option>
-          <option value="low">Mažai (≤2)</option>
+          <option value="low">Mažai</option>
           <option value="out">Nėra sandėlyje</option>
         </select>
         <select id="f-pagesize" onchange="onFilterChange()" style="min-width:90px;">
@@ -229,44 +178,41 @@
           <option value="200">Rodyti 200</option>
         </select>
       </div>
-      <div class="summary-bar">
-        <label class="select-all-label">
-          <input type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)">
-          Žymėti visus
-        </label>
-        <span id="summary-count">—</span>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <label class="select-all-label">
+            <input type="checkbox" id="select-all" onchange="toggleSelectAll(this.checked)">
+            Žymėti visus
+          </label>
+          <span id="summary-count">—</span>
+        </div>
+        <div class="toolbar-right">
+          <button class="export-btn" onclick="exportCSV()">⬇ CSV</button>
+          <button class="export-btn" onclick="loadProducts(true)">↻ Atnaujinti</button>
+        </div>
       </div>
       <div id="product-list"><div class="spinner-wrap">Kraunamas inventorius…</div></div>
-      <div id="pagination" style="display:flex;justify-content:center;align-items:center;gap:12px;padding:14px 0;"></div>
+      <div id="pagination"></div>
     </div>
 
+    <!-- SCAN -->
     <div id="scan" class="screen">
       <div id="reader"></div>
       <p class="scan-hint" id="scan-hint">Nukreipkite kamerą į prekės QR kodą.</p>
     </div>
 
+    <!-- ADD -->
     <div id="add" class="screen">
-      <label>Nuotrauka</label>
-      <img id="add-photo-preview">
-      <div class="photo-input-row">
-        <label class="photo-btn">Fotografuoti
-          <input type="file" accept="image/*" capture="environment" onchange="handlePhotoSelect(event)">
-        </label>
-        <label class="photo-btn">Pasirinkti iš galerijos
-          <input type="file" accept="image/*" onchange="handlePhotoSelect(event)">
-        </label>
-      </div>
-
-      <label>Prekės pavadinimas</label>
+      <label>Prekės pavadinimas <span class="required-star">*</span></label>
       <input id="add-name" placeholder="pvz. Apvalūs auskarai su cirkoniu">
       <label>SKU (neprivaloma — palikite tuščią automatiniam generavimui)</label>
       <input id="add-sku" placeholder="automatiškai generuojamas, pvz. REWZ-0001">
-      <label>Kategorija</label>
-      <select id="add-category"><option value="">Select category</option></select>
+      <label>Kategorija <span class="required-star">*</span></label>
+      <select id="add-category"><option value="">Pasirinkite kategoriją</option></select>
       <label>Medžiaga</label>
-      <select id="add-material"><option value="">Select material</option></select>
+      <select id="add-material"><option value="">Pasirinkite medžiagą</option></select>
       <label>Akmuo</label>
-      <select id="add-gemstone"><option value="">Select gemstone</option></select>
+      <select id="add-gemstone"><option value="">Pasirinkite akmenį</option></select>
       <label>Svoris (g)</label>
       <input id="add-weight" type="number" step="0.01">
       <label>Pradinis kiekis</label>
@@ -275,12 +221,24 @@
       <input id="add-location" placeholder="pvz. Vitrina 2">
       <label>Pastabos</label>
       <textarea id="add-notes" rows="2"></textarea>
+
+      <label>Nuotrauka</label>
+      <img id="add-photo-preview">
+      <div class="photo-input-row">
+        <label class="photo-btn">📷 Fotografuoti
+          <input type="file" accept="image/*" capture="environment" onchange="handlePhotoSelect(event)">
+        </label>
+        <label class="photo-btn">🖼 Iš galerijos
+          <input type="file" accept="image/*" onchange="handlePhotoSelect(event)">
+        </label>
+      </div>
+
       <button class="primary" onclick="submitAddProduct()">Išsaugoti ir sugeneruoti QR kodą</button>
 
-      <div id="new-product-result" style="display:none; margin-top:24px; text-align:center; border-top:1px solid var(--line); padding-top:20px;">
-        <p style="font-size:13px; color:var(--muted);">Prekė išsaugota. Atspausdinkite etiketę ir pritvirtinkite prie prekės.</p>
+      <div id="new-product-result" style="display:none;margin-top:24px;text-align:center;border-top:1px solid var(--line);padding-top:20px;">
+        <p style="font-size:13px;color:var(--muted);">Prekė išsaugota. Atspausdinkite etiketę ir pritvirtinkite prie prekės.</p>
         <div id="new-qr"></div>
-        <p id="new-product-id" style="font-weight:600; margin-top:8px;"></p>
+        <p id="new-product-id" style="font-weight:600;margin-top:8px;"></p>
         <button class="secondary" onclick="printLabelFor(lastAddedProduct)">Spausdinti etiketę</button>
         <button class="secondary" style="margin-top:8px;" onclick="resetAddForm()">Pridėti kitą prekę</button>
       </div>
@@ -288,17 +246,18 @@
   </main>
 </div>
 
-<!-- Bulk action bar -->
+<!-- BULK BAR -->
 <div class="bulk-bar" id="bulk-bar">
-  <div class="bulk-count" id="bulk-count">0 selected</div>
-  <span style="font-size:12px; color:#aaa;">Kiekis:</span>
-  <input type="number" id="bulk-amount" value="1" min="1" style="width:60px;">
+  <div class="bulk-count" id="bulk-count">0 pažymėta</div>
+  <span style="font-size:12px;color:#aaa;">Kiekis:</span>
+  <input type="number" id="bulk-amount" value="1" min="1">
   <button onclick="applyBulk(1)">+ Pridėti į sandėlį</button>
   <button onclick="applyBulk(-1)">− Pašalinti iš sandėlio</button>
   <button class="clear" onclick="clearSelection()">✕ Atšaukti</button>
 </div>
 
-<div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this) closeModal()">
+<!-- PRODUCT MODAL -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">&times;</button>
     <img id="modal-photo">
@@ -314,14 +273,14 @@
       <input type="number" id="modal-qty-change" placeholder="Kiek vienetų" min="1"
         style="width:100%;padding:10px 11px;border:1px solid var(--line);font-size:14px;margin-bottom:8px;font-family:inherit;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-        <button class="reason-btn reason-add" onclick="applyReason('Arrived', 1)">📦 Gauta +</button>
-        <button class="reason-btn reason-sub" onclick="applyReason('Sold', -1)">🛍 Parduota −</button>
-        <button class="reason-btn reason-add" onclick="applyReason('Returned', 1)">↩️ Grąžinta +</button>
-        <button class="reason-btn reason-sub" onclick="applyReason('Damaged', -1)">⚠️ Sugadinta −</button>
-        <button class="reason-btn reason-add" onclick="applyReason('Correction', 1)">✏️ Korekcija +</button>
-        <button class="reason-btn reason-sub" onclick="applyReason('Correction', -1)">✏️ Korekcija −</button>
-        <button class="reason-btn reason-add" onclick="applyReason('Other', 1)">· Kita +</button>
-        <button class="reason-btn reason-sub" onclick="applyReason('Other', -1)">· Kita −</button>
+        <button class="reason-btn reason-add" onclick="applyReason('Arrived',1)">📦 Gauta +</button>
+        <button class="reason-btn reason-sub" onclick="applyReason('Sold',-1)">🛍 Parduota −</button>
+        <button class="reason-btn reason-add" onclick="applyReason('Returned',1)">↩️ Grąžinta +</button>
+        <button class="reason-btn reason-sub" onclick="applyReason('Damaged',-1)">⚠️ Sugadinta −</button>
+        <button class="reason-btn reason-add" onclick="applyReason('Correction',1)">✏️ Korekcija +</button>
+        <button class="reason-btn reason-sub" onclick="applyReason('Correction',-1)">✏️ Korekcija −</button>
+        <button class="reason-btn reason-add" onclick="applyReason('Other',1)">· Kita +</button>
+        <button class="reason-btn reason-sub" onclick="applyReason('Other',-1)">· Kita −</button>
       </div>
     </div>
 
@@ -333,597 +292,780 @@
     <div class="detail-row"><span>Paskutinis atnaujinimas</span><span id="modal-updated"></span></div>
 
     <div id="qr-display"></div>
-    <button class="secondary" onclick="printLabelFor(activeModalProduct)">Spausdinti QR etiketę</button>
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button class="secondary" style="flex:1;" onclick="printLabelFor(activeModalProduct)">Spausdinti QR etiketę</button>
+      <button class="secondary" style="flex:1;" onclick="toggleEdit()">✏️ Redaguoti</button>
+    </div>
+
+    <!-- EDIT SECTION -->
+    <div class="edit-section" id="edit-section">
+      <br>
+      <label>Pavadinimas</label><input id="edit-name">
+      <label>SKU</label><input id="edit-sku">
+      <label>Kategorija</label><select id="edit-category"><option value="">—</option></select>
+      <label>Medžiaga</label><select id="edit-material"><option value="">—</option></select>
+      <label>Akmuo</label><select id="edit-gemstone"><option value="">—</option></select>
+      <label>Svoris (g)</label><input id="edit-weight" type="number" step="0.01">
+      <label>Vieta</label><input id="edit-location">
+      <label>Pastabos</label><textarea id="edit-notes" rows="2"></textarea>
+      <label>Nuotrauka (pakeisti)</label>
+      <div class="photo-input-row">
+        <label class="photo-btn">📷 Fotografuoti<input type="file" accept="image/*" capture="environment" onchange="handleEditPhoto(event)"></label>
+        <label class="photo-btn">🖼 Iš galerijos<input type="file" accept="image/*" onchange="handleEditPhoto(event)"></label>
+      </div>
+      <div class="edit-actions">
+        <button class="btn-save-edit" onclick="saveEdit()">💾 Išsaugoti pakeitimus</button>
+        <button class="btn-archive" onclick="archiveProduct()">📦 Archyvuoti</button>
+        <button class="btn-delete" onclick="deleteProduct()">🗑 Ištrinti visam laikui</button>
+      </div>
+    </div>
   </div>
 </div>
 
+<!-- SETTINGS MODAL -->
+<div id="settings-modal" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-panel">
+    <button class="modal-close" onclick="closeSettings()">&times;</button>
+    <h3>⚙️ Nustatymai</h3>
+    <label>Žemo kiekio riba (raudona spalva kai kiekis ≤)</label>
+    <input id="s-threshold" type="number" min="0" value="5">
+    <label>El. paštas žemo kiekio įspėjimams</label>
+    <input id="s-email" type="email" placeholder="pvz. info@juvelyrija.lt">
+    <p style="font-size:11px;color:var(--muted);margin:-4px 0 10px;">
+      Automatiniam siuntimui: Apps Script → Triggers → sendLowStockEmail → Time-driven → Day timer
+    </p>
+    <button class="primary" onclick="saveSettings()">Išsaugoti nustatymus</button>
+    <button class="secondary" style="margin-top:8px;" onclick="testEmail()">Siųsti bandymų el. laišką dabar</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script>
-  const API_URL = 'https://script.google.com/macros/s/AKfycbyofI50DPNi7ttIteQEJa1Lz_KhfkLLCIFZTHtvH7f-IUfxz_GFU_jFBsaY2XMz4dguog/exec';
-  let currentUser = JSON.parse(localStorage.getItem('jw_user') || 'null');
-  let allProducts = [];
-  let options = { categories: [], materials: [], gemstones: [] };
-  let activeModalId = null;
-  let activeModalProduct = null;
-  let lastAddedProduct = null;
-  let selectedIds = new Set();
-  let html5QrCode = null;
-  let scanCooldown = false;
-  let pendingPhotoDataUrl = '';
-  let currentPage = 1;
-  let photoObserver = null;
+const API_URL = 'https://script.google.com/macros/s/AKfycbyofI50DPNi7ttIteQEJa1Lz_KhfkLLCIFZTHtvH7f-IUfxz_GFU_jFBsaY2XMz4dguog/exec';
 
-  // ---------- BOOT ----------
-  function boot() {
-    if (currentUser) {
-      document.getElementById('user-chip').textContent = currentUser.username + ' · Atsijungti';
-      show('app-screen');
-      loadOptions();
-      loadProducts();
-    } else {
-      show('login-screen');
-    }
-  }
-  function show(id) {
-    document.querySelectorAll('body > .screen').forEach(s => {
-      s.classList.remove('active');
-      s.style.display = 'none';
-    });
-    const target = document.getElementById(id);
-    target.classList.add('active');
-    target.style.display = '';
-  }
+let currentUser   = JSON.parse(localStorage.getItem('jw_user')||'null');
+let allProducts   = [];
+let options       = {categories:[],materials:[],gemstones:[]};
+let appSettings   = {lowStockThreshold:5, alertEmail:''};
+let activeModalId = null;
+let activeModalProduct = null;
+let lastAddedProduct   = null;
+let selectedIds   = new Set();
+let html5QrCode   = null;
+let scanCooldown  = false;
+let pendingPhotoDataUrl = '';
+let editPhotoDataUrl    = '';
+let currentPage   = 1;
+let photoObserver = null;
 
-  // ---------- API HELPERS ----------
-  async function apiGet(action, params) {
-    const qs = new URLSearchParams({ action, ...(params || {}) });
-    const res = await fetch(`${API_URL}?${qs.toString()}`);
-    return res.json();
-  }
-  async function apiPost(action, payload) {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight
-      body: JSON.stringify({ action, ...(payload || {}) })
-    });
-    return res.json();
-  }
-
-  // ---------- LOGIN ----------
-  async function doLogin() {
-    const u = document.getElementById('login-user').value.trim();
-    const p = document.getElementById('login-pass').value;
-    if (!u || !p) {
-      document.getElementById('login-error').textContent = 'Įveskite vartotojo vardą ir slaptažodį.';
-      return;
-    }
-    document.getElementById('login-error').textContent = 'Jungiamasi…';
-    try {
-      const res = await apiPost('authenticate', { username: u, password: p });
-      if (res.ok) {
-        currentUser = res;
-        localStorage.setItem('jw_user', JSON.stringify(res));
-        document.getElementById('user-chip').textContent = res.username + ' · Atsijungti';
-        document.getElementById('login-error').textContent = '';
-        show('app-screen');
-        loadOptions();
-        loadProducts();
-      } else {
-        document.getElementById('login-error').textContent = 'Neteisingas vartotojo vardas arba slaptažodis.';
-      }
-    } catch (err) {
-      document.getElementById('login-error').textContent = 'Nepavyko prisijungti prie API. Patikrinkite ryšį.';
-    }
-  }
-
-  function doLogout() {
-    currentUser = null;
-    localStorage.removeItem('jw_user');
+// ── BOOT ─────────────────────────────────────────────────────────────────────
+function boot() {
+  if (currentUser) {
+    document.getElementById('user-chip').textContent = currentUser.username + ' · Atsijungti';
+    show('app-screen');
+    loadOptions();
+    loadSettings();
+    loadProducts();
+  } else {
     show('login-screen');
   }
+}
+function show(id) {
+  document.querySelectorAll('body > .screen').forEach(s => { s.classList.remove('active'); s.style.display='none'; });
+  const t = document.getElementById(id);
+  t.classList.add('active'); t.style.display='';
+}
 
-  // ---------- TABS ----------
-  function switchTab(tab) {
-    document.querySelectorAll('main > .screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    if (tab === 'scan') startScanner();
-    else stopScanner();
-  }
+// ── API ───────────────────────────────────────────────────────────────────────
+async function apiGet(action, params) {
+  const qs = new URLSearchParams({action,...(params||{})});
+  const res = await fetch(`${API_URL}?${qs}`);
+  return res.json();
+}
+async function apiPost(action, payload) {
+  const res = await fetch(API_URL, {
+    method:'POST',
+    headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body: JSON.stringify({action,...(payload||{})})
+  });
+  return res.json();
+}
 
-  // ---------- OPTIONS (dropdowns) ----------
-  async function loadOptions() {
-    try {
-      const res = await apiGet('getOptions');
-      if (res.error) throw new Error(res.error);
-      options = res;
-      fillSelect('add-category', options.categories, 'Select category');
-      fillSelect('add-material', options.materials, 'Select material');
-      fillSelect('add-gemstone', options.gemstones, 'Select gemstone');
-    } catch (err) {
-      showToast('Nepavyko įkelti sąrašų: ' + err.message);
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+async function doLogin() {
+  const u = document.getElementById('login-user').value.trim();
+  const p = document.getElementById('login-pass').value;
+  if (!u||!p) { document.getElementById('login-error').textContent='Įveskite vartotojo vardą ir slaptažodį.'; return; }
+  document.getElementById('login-error').textContent='Jungiamasi…';
+  try {
+    const res = await apiPost('authenticate',{username:u,password:p});
+    if (res.ok) {
+      currentUser = res;
+      localStorage.setItem('jw_user', JSON.stringify(res));
+      document.getElementById('user-chip').textContent = res.username+' · Atsijungti';
+      document.getElementById('login-error').textContent='';
+      show('app-screen');
+      loadOptions(); loadSettings(); loadProducts();
+    } else {
+      document.getElementById('login-error').textContent='Neteisingas vartotojo vardas arba slaptažodis.';
     }
+  } catch(err) {
+    document.getElementById('login-error').textContent='Nepavyko prisijungti prie API.';
   }
-  function fillSelect(id, values, placeholder) {
-    const sel = document.getElementById(id);
-    sel.innerHTML = `<option value="">${placeholder}</option>` + values.map(v => `<option>${escapeHtml(v)}</option>`).join('');
-  }
+}
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('jw_user');
+  show('login-screen');
+}
 
-  // ---------- INVENTORY ----------
-  async function loadProducts() {
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('main > .screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab===tab));
+  if (tab==='scan') startScanner(); else stopScanner();
+}
+
+// ── OPTIONS ───────────────────────────────────────────────────────────────────
+async function loadOptions() {
+  try {
+    const res = await apiGet('getOptions');
+    if (res.error) return;
+    options = res;
+    fillSelect('add-category', res.categories, 'Pasirinkite kategoriją');
+    fillSelect('add-material', res.materials,   'Pasirinkite medžiagą');
+    fillSelect('add-gemstone', res.gemstones,   'Pasirinkite akmenį');
+    fillSelect('edit-category', res.categories, '—');
+    fillSelect('edit-material', res.materials,  '—');
+    fillSelect('edit-gemstone', res.gemstones,  '—');
+  } catch(e) {}
+}
+function fillSelect(id, values, placeholder) {
+  const sel = document.getElementById(id);
+  if (!sel) return;
+  sel.innerHTML = `<option value="">${placeholder}</option>` + values.map(v=>`<option>${escapeHtml(v)}</option>`).join('');
+}
+
+// ── SETTINGS ─────────────────────────────────────────────────────────────────
+async function loadSettings() {
+  // Load from localStorage first for instant threshold display
+  const cached = localStorage.getItem('jw_settings');
+  if (cached) { try { appSettings = {...appSettings,...JSON.parse(cached)}; } catch(e){} }
+  try {
+    const res = await apiGet('getSettings');
+    if (res.lowStockThreshold !== undefined) {
+      appSettings.lowStockThreshold = Number(res.lowStockThreshold)||5;
+      appSettings.alertEmail = res.alertEmail||'';
+      localStorage.setItem('jw_settings', JSON.stringify(appSettings));
+    }
+  } catch(e){}
+}
+function openSettings() {
+  document.getElementById('s-threshold').value = appSettings.lowStockThreshold||5;
+  document.getElementById('s-email').value = appSettings.alertEmail||'';
+  document.getElementById('settings-modal').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('open');
+}
+async function saveSettings() {
+  const threshold = Number(document.getElementById('s-threshold').value)||5;
+  const email     = document.getElementById('s-email').value.trim();
+  appSettings.lowStockThreshold = threshold;
+  appSettings.alertEmail = email;
+  localStorage.setItem('jw_settings', JSON.stringify(appSettings));
+  try {
+    await apiPost('saveSettings', {settings:{lowStockThreshold:threshold, alertEmail:email}});
+    showToast('Nustatymai išsaugoti');
+    closeSettings();
+    renderProducts(); // re-render to apply new threshold
+  } catch(e) { showToast('Klaida: '+e.message); }
+}
+async function testEmail() {
+  showToast('Siunčiamas el. laiškas…');
+  try {
+    const res = await apiPost('sendLowStockEmail',{});
+    showToast(res.message || (res.error ? 'Klaida: '+res.error : 'Išsiųsta'));
+  } catch(e) { showToast('Klaida: '+e.message); }
+}
+
+// ── PRODUCTS ──────────────────────────────────────────────────────────────────
+async function loadProducts(forceRefresh) {
+  const CACHE_KEY = 'jw_products';
+  // Show cached immediately
+  if (!forceRefresh) {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      try {
+        allProducts = JSON.parse(cached);
+        populateFilterOptions();
+        renderProducts();
+        document.getElementById('summary-count').innerHTML +=
+          ' <span class="stale-badge">(iš talpyklos)</span>';
+      } catch(e) {}
+    } else {
+      document.getElementById('product-list').innerHTML = '<div class="spinner-wrap">Kraunamas inventorius…</div>';
+    }
+  } else {
     document.getElementById('product-list').innerHTML = '<div class="spinner-wrap">Kraunamas inventorius…</div>';
-    try {
-      const products = await apiGet('getProducts');
-      if (products.error) throw new Error(products.error);
-      allProducts = products;
-      populateFilterOptions();
-      renderProducts();
-    } catch (err) {
+  }
+  try {
+    const products = await apiGet('getProducts');
+    if (products.error) throw new Error(products.error);
+    allProducts = products;
+    localStorage.setItem(CACHE_KEY, JSON.stringify(products));
+    populateFilterOptions();
+    renderProducts();
+  } catch(err) {
+    if (!allProducts.length)
       document.getElementById('product-list').innerHTML =
-        `<div class="empty-state">Could not load inventory.<br>${escapeHtml(err.message)}</div>`;
+        `<div class="empty-state">Nepavyko įkelti inventoriaus.<br>${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function populateFilterOptions() {
+  const cats = [...new Set(allProducts.map(p=>p.Category).filter(Boolean))].sort();
+  const locs = [...new Set(allProducts.map(p=>p.Location).filter(Boolean))].sort();
+  document.getElementById('f-category').innerHTML =
+    '<option value="">Visos kategorijos</option>'+cats.map(c=>`<option>${escapeHtml(c)}</option>`).join('');
+  document.getElementById('f-location').innerHTML =
+    '<option value="">Visos vietos</option>'+locs.map(l=>`<option>${escapeHtml(l)}</option>`).join('');
+}
+
+function onFilterChange() { currentPage=1; renderProducts(); }
+
+function getFiltered() {
+  const search = document.getElementById('f-search').value.toLowerCase();
+  const cat    = document.getElementById('f-category').value;
+  const loc    = document.getElementById('f-location').value;
+  const sf     = document.getElementById('f-stock').value;
+  const thr    = appSettings.lowStockThreshold || 5;
+  return allProducts.filter(p => {
+    if (search && !(`${p.Name} ${p.SKU}`.toLowerCase().includes(search))) return false;
+    if (cat && p.Category!==cat) return false;
+    if (loc && p.Location!==loc) return false;
+    const qty = Number(p.Quantity)||0;
+    if (sf==='instock' && qty<=0) return false;
+    if (sf==='low' && !(qty>0 && qty<=thr)) return false;
+    if (sf==='out' && qty>0) return false;
+    return true;
+  });
+}
+
+function renderProducts() {
+  const filtered  = getFiltered();
+  const pageSize  = Number(document.getElementById('f-pagesize').value)||50;
+  const totalPages= Math.max(1, Math.ceil(filtered.length/pageSize));
+  if (currentPage>totalPages) currentPage=totalPages;
+  const pageItems = filtered.slice((currentPage-1)*pageSize, currentPage*pageSize);
+  const thr = appSettings.lowStockThreshold||5;
+
+  document.getElementById('summary-count').textContent =
+    `${filtered.length} vnt.` + (totalPages>1 ? ` · puslapis ${currentPage}/${totalPages}` : '');
+
+  const list = document.getElementById('product-list');
+  if (!filtered.length) {
+    list.innerHTML='<div class="empty-state">Nėra prekių pagal šiuos filtrus.</div>';
+    document.getElementById('pagination').innerHTML='';
+    updateBulkBar(); return;
+  }
+
+  list.innerHTML = pageItems.map(p => {
+    const qty = Number(p.Quantity)||0;
+    const isLow = qty<=thr && qty>=0;
+    const lowClass = isLow ? 'low' : '';
+    const cardLow  = isLow ? 'low-stock' : '';
+    const checked  = selectedIds.has(p.ID) ? 'checked' : '';
+    return `<div class="product-card ${cardLow}" onclick="openModal('${p.ID}')">
+      <input type="checkbox" class="card-checkbox" ${checked}
+        onclick="event.stopPropagation()"
+        onchange="toggleSelect('${p.ID}',this.checked)">
+      <div class="card-thumb lazy-thumb" data-id="${p.ID}"></div>
+      <div class="card-body">
+        <div class="pname">${escapeHtml(p.Name||'(unnamed)')}</div>
+        <div class="pmeta">${escapeHtml(p.SKU||p.ID)} · ${escapeHtml(p.Category||'—')}</div>
+      </div>
+      <div class="card-right">
+        <div class="qty-badge ${lowClass}">${qty}</div>
+        <button class="quick-sell" onclick="quickSell(event,'${p.ID}')">−1 Parduota</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  renderPagination(totalPages);
+  updateBulkBar();
+  setupLazyPhotos();
+}
+
+function renderPagination(totalPages) {
+  const pag = document.getElementById('pagination');
+  if (totalPages<=1) { pag.innerHTML=''; return; }
+  let html = `<button class="pg-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Atgal</button>`;
+  for (let i=1; i<=totalPages; i++) {
+    if (totalPages>7 && Math.abs(i-currentPage)>2 && i!==1 && i!==totalPages) {
+      if (i===2||i===totalPages-1) html+='<span>…</span>';
+      continue;
     }
+    html+=`<button class="pg-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
   }
+  html+=`<button class="pg-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Pirmyn ›</button>`;
+  pag.innerHTML=html;
+}
 
-  function populateFilterOptions() {
-    const cats = [...new Set(allProducts.map(p => p.Category).filter(Boolean))].sort();
-    const locs = [...new Set(allProducts.map(p => p.Location).filter(Boolean))].sort();
-    document.getElementById('f-category').innerHTML = '<option value="">Visos kategorijos</option>' + cats.map(c => `<option>${escapeHtml(c)}</option>`).join('');
-    document.getElementById('f-location').innerHTML = '<option value="">Visos vietos</option>' + locs.map(l => `<option>${escapeHtml(l)}</option>`).join('');
-  }
+function goPage(n) {
+  const filtered=getFiltered();
+  const pageSize=Number(document.getElementById('f-pagesize').value)||50;
+  currentPage=Math.max(1,Math.min(n,Math.ceil(filtered.length/pageSize)));
+  renderProducts(); window.scrollTo(0,0);
+}
 
-  function getFiltered() {
-    const search = document.getElementById('f-search').value.toLowerCase();
-    const cat = document.getElementById('f-category').value;
-    const loc = document.getElementById('f-location').value;
-    const stockFilter = document.getElementById('f-stock').value;
-
-    return allProducts.filter(p => {
-      if (search && !(`${p.Name} ${p.SKU}`.toLowerCase().includes(search))) return false;
-      if (cat && p.Category !== cat) return false;
-      if (loc && p.Location !== loc) return false;
-      const qty = Number(p.Quantity) || 0;
-      if (stockFilter === 'instock' && qty <= 0) return false;
-      if (stockFilter === 'low' && !(qty > 0 && qty <= 2)) return false;
-      if (stockFilter === 'out' && qty > 0) return false;
-      return true;
-    });
-  }
-
-  function onFilterChange() {
-    currentPage = 1;
-    renderProducts();
-  }
-
-  function renderProducts() {
-    const filtered = getFiltered();
-    const pageSize = Number(document.getElementById('f-pagesize').value) || 50;
-    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-    if (currentPage > totalPages) currentPage = totalPages;
-    const pageItems = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
-    const list = document.getElementById('product-list');
-    document.getElementById('summary-count').textContent =
-      `${filtered.length} vnt.` +
-      (totalPages > 1 ? ` · puslapis ${currentPage}/${totalPages}` : '');
-
-    if (!filtered.length) {
-      list.innerHTML = '<div class="empty-state">No items match these filters.</div>';
-      document.getElementById('pagination').innerHTML = '';
-      updateBulkBar();
-      return;
-    }
-
-    list.innerHTML = pageItems.map(p => {
-      const qty = Number(p.Quantity) || 0;
-      const lowClass = qty <= 2 ? 'low' : '';
-      const checked = selectedIds.has(p.ID) ? 'checked' : '';
-      // Thumb uses a placeholder div; photo loaded lazily via IntersectionObserver
-      return `<div class="product-card">
-        <input type="checkbox" class="card-checkbox" ${checked} onchange="toggleSelect('${p.ID}', this.checked)">
-        <div class="card-thumb lazy-thumb" data-id="${p.ID}" onclick="openModal('${p.ID}')"></div>
-        <div class="card-body" onclick="openModal('${p.ID}')">
-          <div class="pname">${escapeHtml(p.Name || '(unnamed)')}</div>
-          <div class="pmeta">${escapeHtml(p.SKU || p.ID)} · ${escapeHtml(p.Category || '—')}</div>
-        </div>
-        <div class="qty-badge ${lowClass}" onclick="openModal('${p.ID}')">${qty}</div>
-      </div>`;
-    }).join('');
-
-    renderPagination(totalPages);
-    updateBulkBar();
-    setupLazyPhotos();
-  }
-
-  function renderPagination(totalPages) {
-    const pag = document.getElementById('pagination');
-    if (totalPages <= 1) { pag.innerHTML = ''; return; }
-    const btnStyle = 'padding:7px 14px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:13px;';
-    const activeBtnStyle = 'padding:7px 14px;border:1px solid var(--gold);background:var(--gold);color:#fff;cursor:default;font-size:13px;';
-    let html = `<button style="${btnStyle}" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹ Atgal</button>`;
-    for (let i = 1; i <= totalPages; i++) {
-      if (totalPages > 7 && Math.abs(i - currentPage) > 2 && i !== 1 && i !== totalPages) {
-        if (i === 2 || i === totalPages - 1) html += `<span style="padding:0 4px;">…</span>`;
-        continue;
+// ── LAZY PHOTOS ───────────────────────────────────────────────────────────────
+function setupLazyPhotos() {
+  if (photoObserver) photoObserver.disconnect();
+  photoObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const id = el.dataset.id;
+      if (!id||el.dataset.loaded) return;
+      el.dataset.loaded='1';
+      photoObserver.unobserve(el);
+      const p = allProducts.find(x=>x.ID===id);
+      if (p && p.PhotoData) { applyThumb(el,p.PhotoData); }
+      else if (p) {
+        apiGet('getPhoto',{id}).then(res=>{
+          if (res.photo) { p.PhotoData=res.photo; applyThumb(el,res.photo); }
+        }).catch(()=>{});
       }
-      html += `<button style="${i === currentPage ? activeBtnStyle : btnStyle}" onclick="goPage(${i})">${i}</button>`;
-    }
-    html += `<button style="${btnStyle}" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled':''}>Pirmyn ›</button>`;
-    pag.innerHTML = html;
-  }
-
-  function goPage(n) {
-    const filtered = getFiltered();
-    const pageSize = Number(document.getElementById('f-pagesize').value) || 50;
-    const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-    currentPage = Math.max(1, Math.min(n, totalPages));
-    renderProducts();
-    window.scrollTo(0, 0);
-  }
-
-  // Lazy photo loading — loads photo only when the thumb scrolls into view
-  function setupLazyPhotos() {
-    if (photoObserver) photoObserver.disconnect();
-    photoObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const el = entry.target;
-        const id = el.dataset.id;
-        if (!id || el.dataset.loaded) return;
-        el.dataset.loaded = '1';
-        photoObserver.unobserve(el);
-        // Check if we already have photo in memory
-        const p = allProducts.find(x => x.ID === id);
-        if (p && p.PhotoData) {
-          applyThumb(el, p.PhotoData);
-        } else if (p) {
-          // Fetch photo from API
-          apiGet('getPhoto', { id }).then(res => {
-            if (res.photo) {
-              p.PhotoData = res.photo; // cache it
-              applyThumb(el, res.photo);
-            }
-          }).catch(() => {});
-        }
-      });
-    }, { rootMargin: '100px' });
-
-    document.querySelectorAll('.lazy-thumb').forEach(el => photoObserver.observe(el));
-  }
-
-  function applyThumb(el, dataUrl) {
-    el.style.backgroundImage = `url(${dataUrl})`;
-    el.style.backgroundSize = 'cover';
-    el.style.backgroundPosition = 'center';
-  }
-
-  // ---------- SELECTION / BULK ACTIONS ----------
-  function toggleSelect(id, checked) {
-    if (checked) selectedIds.add(id); else selectedIds.delete(id);
-    updateBulkBar();
-  }
-  function toggleSelectAll(checked) {
-    const filtered = getFiltered();
-    if (checked) filtered.forEach(p => selectedIds.add(p.ID));
-    else filtered.forEach(p => selectedIds.delete(p.ID));
-    renderProducts(); // keep current page
-  }
-  function clearSelection() {
-    selectedIds.clear();
-    document.getElementById('select-all').checked = false;
-    renderProducts();
-  }
-  function updateBulkBar() {
-    const bar = document.getElementById('bulk-bar');
-    if (selectedIds.size > 0) {
-      bar.classList.add('active');
-      document.getElementById('bulk-count').textContent = `${selectedIds.size} selected`;
-    } else {
-      bar.classList.remove('active');
-    }
-  }
-  async function applyBulk(sign) {
-    const amount = Math.abs(Number(document.getElementById('bulk-amount').value)) || 1;
-    const ids = [...selectedIds];
-    if (!ids.length) return;
-
-    // Calculate new quantities on the frontend using allProducts (which we know is correct)
-    // then call setQuantity so the server just writes the value, no read needed
-    const updates = ids.map(id => {
-      const p = allProducts.find(x => x.ID === id);
-      const currentQty = Number(p ? p.Quantity : 0);
-      const newQty = Math.max(0, currentQty + (sign * amount));
-      return { id, newQty };
     });
+  },{rootMargin:'100px'});
+  document.querySelectorAll('.lazy-thumb').forEach(el=>photoObserver.observe(el));
+}
+function applyThumb(el, dataUrl) {
+  el.style.backgroundImage=`url(${dataUrl})`;
+  el.style.backgroundSize='cover';
+  el.style.backgroundPosition='center';
+}
 
-    showToast('Atnaujinama…');
-    try {
-      // Run all setQuantity calls in parallel
-      await Promise.all(updates.map(u =>
-        apiPost('setQuantity', { id: u.id, quantity: u.newQty, username: currentUser ? currentUser.username : '', reason: sign > 0 ? 'Masinis pridėjimas' : 'Masinis pašalinimas' })
-      ));
-      showToast(`${sign > 0 ? 'Pridėta' : 'Pašalinta'} ${amount} on ${ids.length} vnt.`);
-      clearSelection();
-      await loadProducts();
-    } catch (err) {
-      showToast('Masinis atnaujinimas nepavyko: ' + err.message);
-    }
-  }
+// ── QUICK SELL ────────────────────────────────────────────────────────────────
+async function quickSell(event, id) {
+  event.stopPropagation();
+  const p = allProducts.find(x=>x.ID===id);
+  if (!p) return;
+  const newQty = Math.max(0, Number(p.Quantity||0)-1);
+  p.Quantity = newQty;
+  renderProducts();
+  try {
+    await apiPost('setQuantity',{id, quantity:newQty, username:currentUser?.username||'', reason:'Sold'});
+    showToast(`${p.Name}: −1 Parduota`);
+    // Update cache
+    localStorage.setItem('jw_products', JSON.stringify(allProducts));
+  } catch(e) { showToast('Klaida — pakeitimas neišsaugotas'); }
+}
 
-  // ---------- MODAL ----------
-  function openModal(id) {
-    try {
-    const p = allProducts.find(x => x.ID === id);
-    if (!p) { showToast('Prekė nerasta: ' + id); return; }
-    activeModalId = id;
-    activeModalProduct = p;
-    document.getElementById('modal-name').textContent = p.Name || '(unnamed)';
-    document.getElementById('modal-sku').textContent = (p.SKU || p.ID);
-    document.getElementById('modal-qty').textContent = Number(p.Quantity) || 0;
-    document.getElementById('modal-qty-change').value = '';
-    document.getElementById('modal-category').textContent = p.Category || '—';
-    document.getElementById('modal-material').textContent = p.Material || '—';
-    document.getElementById('modal-gemstone').textContent = p.Gemstone || '—';
-    document.getElementById('modal-weight').textContent = p.WeightGrams ? p.WeightGrams + ' g' : '—';
-    document.getElementById('modal-location').textContent = p.Location || '—';
-    document.getElementById('modal-updated').textContent = p.LastUpdated ? new Date(p.LastUpdated).toLocaleString() : '—';
+// ── SELECTION / BULK ──────────────────────────────────────────────────────────
+function toggleSelect(id, checked) {
+  if (checked) selectedIds.add(id); else selectedIds.delete(id);
+  updateBulkBar();
+}
+function toggleSelectAll(checked) {
+  getFiltered().forEach(p => checked ? selectedIds.add(p.ID) : selectedIds.delete(p.ID));
+  renderProducts();
+}
+function clearSelection() {
+  selectedIds.clear();
+  document.getElementById('select-all').checked=false;
+  renderProducts();
+}
+function updateBulkBar() {
+  const bar=document.getElementById('bulk-bar');
+  if (selectedIds.size>0) {
+    bar.classList.add('active');
+    document.getElementById('bulk-count').textContent=`${selectedIds.size} pažymėta`;
+  } else bar.classList.remove('active');
+}
+async function applyBulk(sign) {
+  const amount=Math.abs(Number(document.getElementById('bulk-amount').value))||1;
+  const ids=[...selectedIds];
+  if (!ids.length) return;
+  const updates=ids.map(id=>{
+    const p=allProducts.find(x=>x.ID===id);
+    const cur=Number(p?p.Quantity:0);
+    return {id, newQty:Math.max(0,cur+(sign*amount))};
+  });
+  showToast('Atnaujinama…');
+  try {
+    await Promise.all(updates.map(u=>
+      apiPost('setQuantity',{id:u.id,quantity:u.newQty,username:currentUser?.username||'',
+        reason: sign>0?'Masinis pridėjimas':'Masinis pašalinimas'})
+    ));
+    updates.forEach(u=>{ const p=allProducts.find(x=>x.ID===u.id); if(p) p.Quantity=u.newQty; });
+    localStorage.setItem('jw_products', JSON.stringify(allProducts));
+    showToast(`${sign>0?'Pridėta':'Pašalinta'} ${amount} — ${ids.length} vnt.`);
+    clearSelection();
+    renderProducts();
+  } catch(e) { showToast('Klaida: '+e.message); }
+}
 
-    const photoEl = document.getElementById('modal-photo');
-    photoEl.style.display = 'none';
-    if (p.PhotoData) {
-      photoEl.src = p.PhotoData;
-      photoEl.style.display = 'block';
-    } else {
-      apiGet('getPhoto', { id }).then(res => {
+// ── EXPORT CSV ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const headers=['ID','SKU','Pavadinimas','Kategorija','Medžiaga','Akmuo','Svoris(g)','Kiekis','Vieta','Pastabos'];
+  const filtered=getFiltered();
+  const rows=filtered.map(p=>[
+    p.ID,p.SKU,p.Name,p.Category,p.Material,p.Gemstone,p.WeightGrams,p.Quantity,p.Location,p.Notes
+  ].map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(','));
+  const csv=[headers.join(','),...rows].join('\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=`inventorius_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(id) {
+  try {
+    const p=allProducts.find(x=>x.ID===id);
+    if (!p) { showToast('Prekė nerasta'); return; }
+    activeModalId=id; activeModalProduct=p;
+
+    document.getElementById('modal-name').textContent=p.Name||'(unnamed)';
+    document.getElementById('modal-sku').textContent=p.SKU||p.ID;
+    document.getElementById('modal-qty').textContent=Number(p.Quantity)||0;
+    document.getElementById('modal-qty-change').value='';
+    document.getElementById('modal-category').textContent=p.Category||'—';
+    document.getElementById('modal-material').textContent=p.Material||'—';
+    document.getElementById('modal-gemstone').textContent=p.Gemstone||'—';
+    document.getElementById('modal-weight').textContent=p.WeightGrams?p.WeightGrams+' g':'—';
+    document.getElementById('modal-location').textContent=p.Location||'—';
+    document.getElementById('modal-updated').textContent=p.LastUpdated?new Date(p.LastUpdated).toLocaleString():'—';
+
+    // Close edit section
+    document.getElementById('edit-section').classList.remove('open');
+    editPhotoDataUrl='';
+
+    const photoEl=document.getElementById('modal-photo');
+    photoEl.style.display='none';
+    if (p.PhotoData) { photoEl.src=p.PhotoData; photoEl.style.display='block'; }
+    else {
+      apiGet('getPhoto',{id}).then(res=>{
         if (res.photo) {
-          p.PhotoData = res.photo;
-          photoEl.src = res.photo;
-          photoEl.style.display = 'block';
-          const thumb = document.querySelector(`.lazy-thumb[data-id="${id}"]`);
-          if (thumb) applyThumb(thumb, res.photo);
+          p.PhotoData=res.photo;
+          photoEl.src=res.photo; photoEl.style.display='block';
+          const thumb=document.querySelector(`.lazy-thumb[data-id="${id}"]`);
+          if (thumb) applyThumb(thumb,res.photo);
         }
-      }).catch(() => {});
+      }).catch(()=>{});
     }
 
-    const qrDiv = document.getElementById('qr-display');
-    qrDiv.innerHTML = '';
-    new QRCode(qrDiv, { text: p.ID, width: 140, height: 140 });
+    const qrDiv=document.getElementById('qr-display');
+    qrDiv.innerHTML='';
+    new QRCode(qrDiv,{text:p.ID,width:140,height:140});
 
     document.getElementById('modal-backdrop').classList.add('active');
-    } catch(err) { showToast('Klaida: ' + err.message); }
-  }
+  } catch(err) { showToast('Klaida: '+err.message); }
+}
 
-  function closeModal() {
-    document.getElementById('modal-backdrop').classList.remove('active');
-    activeModalId = null;
-    activeModalProduct = null;
-  }
+function closeModal() {
+  document.getElementById('modal-backdrop').classList.remove('active');
+  activeModalId=null; activeModalProduct=null;
+}
 
-  async function changeQty(delta) {
-    if (!activeModalId) return;
-    const qtyEl = document.getElementById('modal-qty');
-    const newQty = Math.max(0, Number(qtyEl.textContent) + delta);
-    qtyEl.textContent = newQty;
-    try {
-      const res = await apiPost('setQuantity', { id: activeModalId, quantity: newQty, username: currentUser ? currentUser.username : '', reason: delta > 0 ? 'Rankinis +1' : 'Rankinis −1' });
-      if (res.ok) { const p = allProducts.find(x => x.ID === activeModalId); if (p) p.Quantity = res.newQuantity; renderProducts(); }
-    } catch (err) { showToast('Tinklo klaida — pakeitimas neišsaugotas'); }
-  }
-
-  async function applyReason(reason, sign) {
-    if (!activeModalId) return;
-    const amount = Math.abs(Number(document.getElementById('modal-qty-change').value));
-    if (!amount || amount < 1) { showToast('Pirmiau įveskite kiekį'); return; }
-    const qtyEl = document.getElementById('modal-qty');
-    const newQty = Math.max(0, Number(qtyEl.textContent) + (sign * amount));
-    qtyEl.textContent = newQty;
-    document.getElementById('modal-qty-change').value = '';
-    try {
-      const res = await apiPost('setQuantity', { id: activeModalId, quantity: newQty, username: currentUser ? currentUser.username : '', reason });
-      if (res.ok) {
-        const p = allProducts.find(x => x.ID === activeModalId);
-        if (p) p.Quantity = res.newQuantity;
-        renderProducts();
-        showToast(`${reason}: ${sign > 0 ? '+' : '−'}${amount}`);
-      }
-    } catch (err) { showToast('Tinklo klaida — pakeitimas neišsaugotas'); }
-  }
-
-  // ---------- PHOTO CAPTURE (Add form) ----------
-  function handlePhotoSelect(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const img = new Image();
-    const reader = new FileReader();
-    reader.onload = e => {
-      img.onload = () => {
-        // Resize/compress to max 300px so it fits in a Sheets cell
-        const maxDim = 300;
-        let { width, height } = img;
-        if (width > height && width > maxDim) { height *= maxDim / width; width = maxDim; }
-        else if (height > maxDim) { width *= maxDim / height; height = maxDim; }
-        const canvas = document.createElement('canvas');
-        canvas.width = width; canvas.height = height;
-        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-        pendingPhotoDataUrl = canvas.toDataURL('image/jpeg', 0.75);
-        const preview = document.getElementById('add-photo-preview');
-        preview.src = pendingPhotoDataUrl;
-        preview.style.display = 'block';
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  // ---------- ADD PRODUCT ----------
-  async function submitAddProduct() {
-    const name = document.getElementById('add-name').value.trim();
-    if (!name) { showToast('Įveskite prekės pavadinimą'); return; }
-    const product = {
-      name: name,
-      sku: document.getElementById('add-sku').value.trim(),
-      category: document.getElementById('add-category').value,
-      material: document.getElementById('add-material').value,
-      gemstone: document.getElementById('add-gemstone').value,
-      weight: document.getElementById('add-weight').value,
-      quantity: document.getElementById('add-quantity').value || 0,
-      location: document.getElementById('add-location').value.trim(),
-      notes: document.getElementById('add-notes').value.trim(),
-      photoBase64: pendingPhotoDataUrl || ''
-    };
-    try {
-      const saved = await apiPost('addProduct', { product });
-      if (saved.error) throw new Error(saved.error);
-      allProducts.push(saved);
-      lastAddedProduct = saved;
-      document.getElementById('new-qr').innerHTML = '';
-      new QRCode(document.getElementById('new-qr'), { text: saved.ID, width: 160, height: 160 });
-      document.getElementById('new-product-id').textContent = saved.SKU || saved.ID;
-      document.getElementById('new-product-result').style.display = 'block';
-      showToast('Prekė išsaugota: ' + (saved.SKU || saved.ID));
-    } catch (err) {
-      showToast('Nepavyko išsaugoti: ' + err.message);
+// ── QUANTITY CONTROLS ─────────────────────────────────────────────────────────
+async function changeQty(delta) {
+  if (!activeModalId) return;
+  const qtyEl=document.getElementById('modal-qty');
+  const newQty=Math.max(0,Number(qtyEl.textContent)+delta);
+  qtyEl.textContent=newQty;
+  try {
+    const res=await apiPost('setQuantity',{id:activeModalId,quantity:newQty,
+      username:currentUser?.username||'', reason:delta>0?'Rankinis +1':'Rankinis −1'});
+    if (res.ok) {
+      const p=allProducts.find(x=>x.ID===activeModalId);
+      if(p) p.Quantity=res.newQuantity;
+      localStorage.setItem('jw_products',JSON.stringify(allProducts));
+      renderProducts();
     }
-  }
+  } catch(e) { showToast('Tinklo klaida — pakeitimas neišsaugotas'); }
+}
 
-  function resetAddForm() {
-    ['add-name','add-sku','add-category','add-material','add-gemstone','add-weight','add-location','add-notes']
-      .forEach(id => document.getElementById(id).value = '');
-    document.getElementById('add-quantity').value = 1;
-    document.getElementById('new-product-result').style.display = 'none';
-    document.getElementById('add-photo-preview').style.display = 'none';
-    document.getElementById('add-photo-preview').src = '';
-    pendingPhotoDataUrl = '';
-  }
-
-  // ---------- PRINT LABEL ----------
-  function printLabelFor(product) {
-    if (!product) return;
-
-    const tempDiv = document.createElement('div');
-    tempDiv.style.cssText = 'position:fixed;left:-9999px;top:0';
-    document.body.appendChild(tempDiv);
-    new QRCode(tempDiv, { text: product.ID, width: 180, height: 180 });
-
-    setTimeout(() => {
-      const canvas = tempDiv.querySelector('canvas');
-      const qrDataUrl = canvas ? canvas.toDataURL() : '';
-      document.body.removeChild(tempDiv);
-
-      const name = (product.Name || '').replace(/</g,'&lt;');
-      const sku  = (product.SKU || product.ID).replace(/</g,'&lt;');
-      const loc  = (product.Location || '').replace(/</g,'&lt;');
-
-      const win = window.open('', '_blank', 'width=300,height=380,toolbar=0,menubar=0,scrollbars=0,resizable=0');
-      if (!win) { showToast('Leiskite iššokančius langus šioje svetainėje, kad galėtumėte spausdinti'); return; }
-
-      win.document.write(`<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><style>
-  @page {
-    size: 50mm 62mm;
-    margin: 0;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body {
-    width: 50mm;
-    background: #fff;
-    font-family: Arial, sans-serif;
-  }
-  .label {
-    width: 50mm;
-    padding: 3mm 2mm 2mm;
-    text-align: center;
-  }
-  .label img {
-    width: 44mm; height: 44mm;
-    display: block; margin: 0 auto;
-  }
-  .name { font-size: 8pt; font-weight: bold; margin-top: 2mm; line-height: 1.3; }
-  .sku  { font-size: 7pt; color: #333; margin-top: 1mm; }
-  .loc  { font-size: 7pt; color: #555; margin-top: 1mm; }
-  .print-btn {
-    display: block; width: 100%; margin-top: 4mm; padding: 3mm;
-    background: #1c1b19; color: #fff; border: none;
-    font-size: 12pt; cursor: pointer; font-family: Arial, sans-serif;
-  }
-  @media print {
-    .print-btn { display: none !important; }
-    html, body { width: 50mm; }
-  }
-</style></head><body>
-<div class="label">
-  <img src="${qrDataUrl}">
-  <div class="name">${name}</div>
-  <div class="sku">${sku}</div>
-  ${loc ? `<div class="loc">${loc}</div>` : ''}
-</div>
-<button class="print-btn" onclick="window.print()">🖨 Spausdinti etiketę</button>
-</body></html>`);
-      win.document.close();
-    }, 250);
-  }
-
-  // ---------- SCAN ----------
-  function startScanner() {
-    if (html5QrCode) return;
-    const hint = document.getElementById('scan-hint');
-    if (!window.isSecureContext) {
-      hint.textContent = 'Camera requires HTTPS. Make sure you opened this page via your https:// link, not a local file.';
-      return;
+async function applyReason(reason, sign) {
+  if (!activeModalId) return;
+  const amount=Math.abs(Number(document.getElementById('modal-qty-change').value));
+  if (!amount||amount<1) { showToast('Pirmiau įveskite kiekį'); return; }
+  const qtyEl=document.getElementById('modal-qty');
+  const newQty=Math.max(0,Number(qtyEl.textContent)+(sign*amount));
+  qtyEl.textContent=newQty;
+  document.getElementById('modal-qty-change').value='';
+  try {
+    const res=await apiPost('setQuantity',{id:activeModalId,quantity:newQty,
+      username:currentUser?.username||'', reason});
+    if (res.ok) {
+      const p=allProducts.find(x=>x.ID===activeModalId);
+      if(p) p.Quantity=res.newQuantity;
+      localStorage.setItem('jw_products',JSON.stringify(allProducts));
+      renderProducts();
+      showToast(`${reason}: ${sign>0?'+':'−'}${amount}`);
     }
-    html5QrCode = new Html5Qrcode('reader');
-    html5QrCode.start(
-      { facingMode: 'environment' },
-      { fps: 10, qrbox: 220 },
-      onScanSuccess
-    ).catch(err => {
-      hint.textContent = 'Kamera nepasiekiama: ' + err + '. Patikrinkite, ar suteikėte leidimą naudoti kamerą naršyklės nustatymuose.';
+  } catch(e) { showToast('Tinklo klaida — pakeitimas neišsaugotas'); }
+}
+
+// ── EDIT PRODUCT ──────────────────────────────────────────────────────────────
+function toggleEdit() {
+  const sec=document.getElementById('edit-section');
+  const isOpen=sec.classList.contains('open');
+  if (!isOpen && activeModalProduct) {
+    const p=activeModalProduct;
+    document.getElementById('edit-name').value=p.Name||'';
+    document.getElementById('edit-sku').value=p.SKU||'';
+    document.getElementById('edit-location').value=p.Location||'';
+    document.getElementById('edit-weight').value=p.WeightGrams||'';
+    document.getElementById('edit-notes').value=p.Notes||'';
+    // Set selects
+    ['edit-category','edit-material','edit-gemstone'].forEach(selId=>{
+      const sel=document.getElementById(selId);
+      const field=selId.replace('edit-','');
+      const fieldMap={category:'Category',material:'Material',gemstone:'Gemstone'};
+      const val=p[fieldMap[field]]||'';
+      const opt=[...sel.options].find(o=>o.value===val||o.text===val);
+      if(opt) sel.value=opt.value; else sel.value='';
     });
   }
+  sec.classList.toggle('open');
+}
 
-  function stopScanner() {
-    if (html5QrCode) {
-      html5QrCode.stop().then(() => { html5QrCode = null; }).catch(() => { html5QrCode = null; });
-    }
-  }
+function handleEditPhoto(event) {
+  const file=event.target.files[0]; if(!file) return;
+  const img=new Image(); const reader=new FileReader();
+  reader.onload=e=>{
+    img.onload=()=>{
+      const maxDim=300; let {width,height}=img;
+      if(width>height&&width>maxDim){height*=maxDim/width;width=maxDim;}
+      else if(height>maxDim){width*=maxDim/height;height=maxDim;}
+      const c=document.createElement('canvas'); c.width=width; c.height=height;
+      c.getContext('2d').drawImage(img,0,0,width,height);
+      editPhotoDataUrl=c.toDataURL('image/jpeg',.75);
+    }; img.src=e.target.result;
+  }; reader.readAsDataURL(file);
+}
 
-  function onScanSuccess(decodedText) {
-    if (scanCooldown) return;
-    scanCooldown = true;
-    setTimeout(() => scanCooldown = false, 1500);
-    const p = allProducts.find(x => x.ID === decodedText);
-    if (p) {
-      switchToTabAndOpen('inventory', p.ID);
-    } else {
-      showToast('Prekė su šiuo kodu nerasta');
-    }
+async function saveEdit() {
+  if (!activeModalId) return;
+  const newSku=document.getElementById('edit-sku').value.trim();
+  // Check duplicate SKU
+  if (newSku) {
+    const dup=allProducts.find(p=>p.SKU===newSku && p.ID!==activeModalId);
+    if (dup) { showToast(`SKU ${newSku} jau naudojamas: ${dup.Name}`); return; }
   }
-  function switchToTabAndOpen(tab, id) {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-    document.querySelectorAll('main > .screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
+  const fields={
+    Name:   document.getElementById('edit-name').value.trim(),
+    SKU:    newSku,
+    Category: document.getElementById('edit-category').value,
+    Material: document.getElementById('edit-material').value,
+    Gemstone: document.getElementById('edit-gemstone').value,
+    WeightGrams: document.getElementById('edit-weight').value,
+    Location: document.getElementById('edit-location').value.trim(),
+    Notes:  document.getElementById('edit-notes').value.trim(),
+  };
+  if (editPhotoDataUrl) fields.photoBase64=editPhotoDataUrl;
+  try {
+    const saved=await apiPost('updateProduct',{id:activeModalId, fields});
+    if (saved.error) throw new Error(saved.error);
+    // Update local
+    const idx=allProducts.findIndex(p=>p.ID===activeModalId);
+    if(idx>=0) {
+      Object.assign(allProducts[idx], fields);
+      if(editPhotoDataUrl) allProducts[idx].PhotoData=editPhotoDataUrl;
+    }
+    activeModalProduct=allProducts[idx];
+    localStorage.setItem('jw_products',JSON.stringify(allProducts));
+    renderProducts();
+    // Refresh modal display
+    document.getElementById('modal-name').textContent=fields.Name;
+    document.getElementById('modal-sku').textContent=fields.SKU||activeModalId;
+    document.getElementById('modal-category').textContent=fields.Category||'—';
+    document.getElementById('modal-material').textContent=fields.Material||'—';
+    document.getElementById('modal-gemstone').textContent=fields.Gemstone||'—';
+    document.getElementById('modal-weight').textContent=fields.WeightGrams?fields.WeightGrams+' g':'—';
+    document.getElementById('modal-location').textContent=fields.Location||'—';
+    if (editPhotoDataUrl) { const ph=document.getElementById('modal-photo'); ph.src=editPhotoDataUrl; ph.style.display='block'; }
+    document.getElementById('edit-section').classList.remove('open');
+    showToast('Pakeitimai išsaugoti');
+  } catch(e) { showToast('Klaida: '+e.message); }
+}
+
+async function archiveProduct() {
+  if (!activeModalId) return;
+  if (!confirm('Archyvuoti šią prekę? Ji bus paslėpta iš sąrašo, bet išliks žurnale.')) return;
+  try {
+    const res=await apiPost('archiveProduct',{id:activeModalId});
+    if (res.ok) {
+      allProducts=allProducts.filter(p=>p.ID!==activeModalId);
+      localStorage.setItem('jw_products',JSON.stringify(allProducts));
+      closeModal(); renderProducts();
+      showToast('Prekė archyvuota');
+    }
+  } catch(e) { showToast('Klaida: '+e.message); }
+}
+
+async function deleteProduct() {
+  if (!activeModalId) return;
+  const p=activeModalProduct;
+  if (!confirm(`VISAM LAIKUI ištrinti "${p?.Name||activeModalId}"? Šio veiksmo negalima atšaukti.`)) return;
+  try {
+    const res=await apiPost('deleteProduct',{id:activeModalId});
+    if (res.ok) {
+      allProducts=allProducts.filter(p=>p.ID!==activeModalId);
+      localStorage.setItem('jw_products',JSON.stringify(allProducts));
+      closeModal(); renderProducts();
+      showToast('Prekė ištrinta');
+    }
+  } catch(e) { showToast('Klaida: '+e.message); }
+}
+
+// ── ADD PRODUCT ───────────────────────────────────────────────────────────────
+function handlePhotoSelect(event) {
+  const file=event.target.files[0]; if(!file) return;
+  const img=new Image(); const reader=new FileReader();
+  reader.onload=e=>{
+    img.onload=()=>{
+      const maxDim=300; let {width,height}=img;
+      if(width>height&&width>maxDim){height*=maxDim/width;width=maxDim;}
+      else if(height>maxDim){width*=maxDim/height;height=maxDim;}
+      const c=document.createElement('canvas'); c.width=width; c.height=height;
+      c.getContext('2d').drawImage(img,0,0,width,height);
+      pendingPhotoDataUrl=c.toDataURL('image/jpeg',.75);
+      const prev=document.getElementById('add-photo-preview');
+      prev.src=pendingPhotoDataUrl; prev.style.display='block';
+    }; img.src=e.target.result;
+  }; reader.readAsDataURL(file);
+}
+
+async function submitAddProduct() {
+  const name=document.getElementById('add-name').value.trim();
+  if (!name) { showToast('Įveskite prekės pavadinimą'); return; }
+  const cat=document.getElementById('add-category').value;
+  if (!cat) { showToast('Pasirinkite kategoriją'); return; }
+  const sku=document.getElementById('add-sku').value.trim();
+  if (sku) {
+    const dup=allProducts.find(p=>p.SKU===sku);
+    if (dup) { showToast(`SKU ${sku} jau naudojamas: ${dup.Name}`); return; }
+  }
+  const product={
+    name, sku, category:cat,
+    material: document.getElementById('add-material').value,
+    gemstone: document.getElementById('add-gemstone').value,
+    weight:   document.getElementById('add-weight').value,
+    quantity: document.getElementById('add-quantity').value||0,
+    location: document.getElementById('add-location').value.trim(),
+    notes:    document.getElementById('add-notes').value.trim(),
+    photoBase64: pendingPhotoDataUrl||''
+  };
+  try {
+    const saved=await apiPost('addProduct',{product});
+    if (saved.error) throw new Error(saved.error);
+    allProducts.push(saved);
+    localStorage.setItem('jw_products',JSON.stringify(allProducts));
+    lastAddedProduct=saved;
+    document.getElementById('new-qr').innerHTML='';
+    new QRCode(document.getElementById('new-qr'),{text:saved.ID,width:160,height:160});
+    document.getElementById('new-product-id').textContent=saved.SKU||saved.ID;
+    document.getElementById('new-product-result').style.display='block';
+    showToast('Prekė išsaugota: '+(saved.SKU||saved.ID));
+  } catch(e) { showToast('Nepavyko išsaugoti: '+e.message); }
+}
+
+function resetAddForm() {
+  ['add-name','add-sku','add-weight','add-location','add-notes'].forEach(id=>document.getElementById(id).value='');
+  ['add-category','add-material','add-gemstone'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('add-quantity').value=1;
+  document.getElementById('new-product-result').style.display='none';
+  document.getElementById('add-photo-preview').style.display='none';
+  document.getElementById('add-photo-preview').src='';
+  pendingPhotoDataUrl='';
+}
+
+// ── PRINT LABEL ───────────────────────────────────────────────────────────────
+function printLabelFor(product) {
+  if (!product) return;
+  const tempDiv=document.createElement('div');
+  tempDiv.style.cssText='position:fixed;left:-9999px;top:0';
+  document.body.appendChild(tempDiv);
+  new QRCode(tempDiv,{text:product.ID,width:180,height:180});
+  setTimeout(()=>{
+    const canvas=tempDiv.querySelector('canvas');
+    const qrDataUrl=canvas?canvas.toDataURL():'';
+    document.body.removeChild(tempDiv);
+    const name=(product.Name||'').replace(/</g,'&lt;');
+    const sku=(product.SKU||product.ID).replace(/</g,'&lt;');
+    const loc=(product.Location||'').replace(/</g,'&lt;');
+    const win=window.open('','_blank','width=300,height=380,toolbar=0,menubar=0,scrollbars=0,resizable=0');
+    if (!win) { showToast('Leiskite iššokančius langus šioje svetainėje'); return; }
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+      @page{size:50mm 62mm;margin:0;}*{box-sizing:border-box;margin:0;padding:0;}
+      html,body{width:50mm;background:#fff;font-family:Arial,sans-serif;}
+      .label{width:50mm;padding:3mm 2mm 2mm;text-align:center;}
+      .label img{width:44mm;height:44mm;display:block;margin:0 auto;}
+      .name{font-size:8pt;font-weight:bold;margin-top:2mm;line-height:1.3;}
+      .sku{font-size:7pt;color:#333;margin-top:1mm;}
+      .loc{font-size:7pt;color:#555;margin-top:1mm;}
+      .print-btn{display:block;width:100%;margin-top:4mm;padding:3mm;background:#1c1b19;color:#fff;border:none;font-size:12pt;cursor:pointer;}
+      @media print{.print-btn{display:none!important;}}
+    </style></head><body>
+    <div class="label">
+      <img src="${qrDataUrl}">
+      <div class="name">${name}</div>
+      <div class="sku">${sku}</div>
+      ${loc?`<div class="loc">${loc}</div>`:''}
+    </div>
+    <button class="print-btn" onclick="window.print()">🖨 Spausdinti etiketę</button>
+    </body></html>`);
+    win.document.close();
+  },250);
+}
+
+// ── SCANNER ───────────────────────────────────────────────────────────────────
+function startScanner() {
+  if (html5QrCode) return;
+  const hint=document.getElementById('scan-hint');
+  if (!window.isSecureContext) { hint.textContent='Kamera reikalauja HTTPS.'; return; }
+  html5QrCode=new Html5Qrcode('reader');
+  html5QrCode.start({facingMode:'environment'},{fps:10,qrbox:220},onScanSuccess)
+    .catch(err=>{ hint.textContent='Kamera nepasiekiama: '+err; });
+}
+function stopScanner() {
+  if (html5QrCode) html5QrCode.stop().then(()=>{html5QrCode=null;}).catch(()=>{html5QrCode=null;});
+}
+function onScanSuccess(decodedText) {
+  if (scanCooldown) return;
+  scanCooldown=true; setTimeout(()=>scanCooldown=false,1500);
+  const p=allProducts.find(x=>x.ID===decodedText);
+  if (p) {
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='inventory'));
+    document.querySelectorAll('main > .screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('inventory').classList.add('active');
     stopScanner();
-    openModal(id);
-  }
+    openModal(p.ID);
+  } else showToast('Prekė su šiuo kodu nerasta');
+}
 
-  // ---------- UTIL ----------
-  function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 1800);
-  }
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
+}
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
 
-  function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
+document.getElementById('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
-  document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-
-  boot();
+boot();
 </script>
 </body>
 </html>
