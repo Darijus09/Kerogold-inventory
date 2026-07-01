@@ -913,7 +913,7 @@ async function archiveProduct() {
   if (!activeModalId) return;
   if (!confirm('Archyvuoti šią prekę? Ji bus paslėpta iš sąrašo, bet išliks žurnale.')) return;
   try {
-    const res=await apiPost('archiveProduct',{id:activeModalId});
+    const res=await apiPost('archiveProduct',{id:activeModalId, username:currentUser?.username||''});
     if (res.ok) {
       allProducts=allProducts.filter(p=>p.ID!==activeModalId);
       localStorage.setItem('jw_products',JSON.stringify(allProducts));
@@ -928,7 +928,7 @@ async function deleteProduct() {
   const p=activeModalProduct;
   if (!confirm(`VISAM LAIKUI ištrinti "${p?.Name||activeModalId}"? Šio veiksmo negalima atšaukti.`)) return;
   try {
-    const res=await apiPost('deleteProduct',{id:activeModalId});
+    const res=await apiPost('deleteProduct',{id:activeModalId, username:currentUser?.username||''});
     if (res.ok) {
       allProducts=allProducts.filter(p=>p.ID!==activeModalId);
       localStorage.setItem('jw_products',JSON.stringify(allProducts));
